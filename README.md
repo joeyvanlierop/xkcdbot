@@ -5,11 +5,11 @@
 
 After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why_do_we_not_have_a_bot/) on the /r/xkcd subreddit, I began working on this bot. It is intended to be a non-intrusive bot that provides a detailed and well formatted comment with information regarding the relevant comic. 
 
-It is currently running 24/7 in the cloud. You can find the bot at [/r/BobbyTableBot](https://www.reddit.com/user/BobbyTablesBot/).
+It is currently running 24/7 in the cloud. You can find the bot at [/r/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
 
 ## Getting Started
 
-To host your own video download bot, follow these simple example steps.
+To host your own xkcd bot, follow these simple example steps.
     
 
 ### Prerequisites
