@@ -26,7 +26,7 @@ To host your own xkcd bot, follow these simple example steps.
       git clone git@github.com:joeyvanlierop/xkcdbot.git
     
 * Create an app [here](https://www.reddit.com/prefs/apps)
-   * Create a copy of [config.examply.py](bot/config.example.py)
+   * Create a copy of [config.examply.yaml](config.example.yaml)
    * Paste the appropritate credentials into the newly created config.py
    * Make sure to also add an appropriate user agent in the config.py
 * Install the requirements
