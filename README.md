@@ -35,7 +35,7 @@ To host your own xkcd bot, follow these simple example steps.
 
 ### Running the bot
 
-    python3 -i bot.py
+    python3 bot.py
     
 ### Start automatically at reboot
 
