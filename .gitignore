@@ -1,9 +1,13 @@
-# Default python stuff
+# VSCode folder
+.vscode
+
+# Default Python stuff
 *.pyc
 *.log
 venv/
 
 # Sensitive configuration files
-config.py
+config.yaml
 
 # Replied comments
+database
