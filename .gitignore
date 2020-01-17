@@ -1,2 +1,9 @@
+# Default python stuff
+*.pyc
+*.log
+venv/
+
 # Sensitive configuration files
-praw.ini
+config.py
+
+# Replied comments
