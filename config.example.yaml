@@ -1,0 +1,16 @@
+- default:
+  - username: "username"
+  - password: "password"
+  - client_id: "client_id"
+  - client_secret: "client_secret"
+  - user_agent: "/u/username by /u/username (v1.0.0)"
+  - subreddits:
+    - "xkcd"
+  - closer:
+    - "^[xkcd.com](https://www.xkcd.com)"
+    - "^[Bugs or Feedback](https://reddit.com/message/compose/?to=username&subject=Feedback)"
+    - "^[Stop Replying](https://reddit.com/message/compose/?to=username&subject=Ignore%20Me&message=Ignore%20Me)"
+    - "^[GitHub](https://github.com/username/repository)"
+    - "^[Bot by /u/username](https://www.reddit.com/user/username)"
+  - blacklisted_users:
+  
