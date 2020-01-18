@@ -5,7 +5,7 @@
 
 After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why_do_we_not_have_a_bot/) on the /r/xkcd subreddit, I began working on this bot. It is intended to be a non-intrusive bot that provides a detailed and well formatted comment with information regarding the relevant comic. 
 
-It is currently running 24/7 in the cloud. You can find the bot at [/r/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
+It is currently running 24/7 in the cloud. You can find the bot at [/u/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
 ## Example
 To use the bot, all you have to do is type the number of the xkcd comic you would like to link in the comment section of any post in /r/xkcd. It is quite conservative with it's matching pattern in order to avoid triggering false positives.
 
