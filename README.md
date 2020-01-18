@@ -6,6 +6,18 @@
 After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why_do_we_not_have_a_bot/) on the /r/xkcd subreddit, I began working on this bot. It is intended to be a non-intrusive bot that provides a detailed and well formatted comment with information regarding the relevant comic. 
 
 It is currently running 24/7 in the cloud. You can find the bot at [/r/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
+## Example
+GitHub-flavored markdown slightly differs from reddit-flavored markdown, so keep in mind that the example here will not reflect the exact formatting:
+
+
+**[1813:](http://xkcd.com/1813)** Vomiting Emoji  
+**Alt-text:** My favorite might be U+1F609 U+1F93F WINKING FACE VOMITING.
+[Image](https://imgs.xkcd.com/comics/vomiting_emoji.png)  
+[Mobile](http://m.xkcd.com/1813)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/1813)
+---
+[xkcd.com](https://www.xkcd.com)&nbsp;|&nbsp;[Bugs&nbsp;or&nbsp;Feedback](https://reddit.com/message/compose/?to=banana_shavings&subject=BobbyTablesBot)&nbsp;|&nbsp;[Stop&nbsp;Replying](https://reddit.com/message/compose/?to=BobbyTablesBot&subject=Ignore%20Me&message=Ignore%20Me)&nbsp;|&nbsp;[GitHub](https://github.com/joeyvanlierop/xkcdbot)&nbsp;|&nbsp;[Bot&nbsp;by&nbsp;/u/banana_shavings](https://www.reddit.com/user/banana_shavings)
+
 
 ## Getting Started
 
