@@ -69,7 +69,7 @@ Please make sure to update tests as appropriate.
 * Task list:
     - [ ] Blacklisting users through inbox messages
     - [ ] Implement databases for blacklisted users and statistics
-    - [ ] Match submissions
+    - [ ] Match submissions (currently only matches comments)
     - [ ] Respond to mentions regardless of subreddit
 
 ## License
