@@ -1,5 +1,5 @@
 <h1 align=center>XKCD Bot</h1>
-<p align=center>A bot for /r/xkcd that replies to any comment referencing a valid xkcd comic number with a detailed reply</p>
+<p align=center>A bot for /r/xkcd that posts detailed comments about xkcd comics</p>
 
 ## About The Project
 
@@ -7,16 +7,21 @@ After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why
 
 It is currently running 24/7 in the cloud. You can find the bot at [/r/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
 ## Example
-GitHub-flavored markdown slightly differs from reddit-flavored markdown, so keep in mind that the example here will not reflect the exact formatting:
+To use the bot, all you have to do is type the number of the xkcd comic you would like to link in the comment section of any post in /r/xkcd. It is quite conservative with it's matching pattern in order to avoid triggering false positives.
 
+For example, if a comment was submitted saying:
 
-**[1813:](http://xkcd.com/1813)** Vomiting Emoji  
-**Alt-text:** My favorite might be U+1F609 U+1F93F WINKING FACE VOMITING.
-[Image](https://imgs.xkcd.com/comics/vomiting_emoji.png)  
-[Mobile](http://m.xkcd.com/1813)  
-[Explanation](http://www.explainxkcd.com/wiki/index.php/1813)
----
-[xkcd.com](https://www.xkcd.com)&nbsp;|&nbsp;[Bugs&nbsp;or&nbsp;Feedback](https://reddit.com/message/compose/?to=banana_shavings&subject=BobbyTablesBot)&nbsp;|&nbsp;[Stop&nbsp;Replying](https://reddit.com/message/compose/?to=BobbyTablesBot&subject=Ignore%20Me&message=Ignore%20Me)&nbsp;|&nbsp;[GitHub](https://github.com/joeyvanlierop/xkcdbot)&nbsp;|&nbsp;[Bot&nbsp;by&nbsp;/u/banana_shavings](https://www.reddit.com/user/banana_shavings)
+> Show me 327  
+
+The bot would respond with:
+
+> **[327:](http://xkcd.com/327)** Exploits of a Mom    
+> **Alt-text:** Her daughter is named Help I'm trapped in a driver's license factory.  
+> [Image](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)  
+> [Mobile](http://m.xkcd.com/327)  
+> [Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
+> ---
+> ^[xkcd.com](https://www.xkcd.com)&nbsp;|&nbsp;[Feedback](https://reddit.com/message/compose/?to=banana_shavings&subject=BobbyTablesBot)&nbsp;|&nbsp;[Stop&nbsp;Replying](https://reddit.com/message/compose/?to=BobbyTablesBot&subject=Ignore%20Me&message=Ignore%20Me)&nbsp;|&nbsp;[GitHub](https://github.com/joeyvanlierop/xkcdbot)&nbsp;|&nbsp;[Programmer](https://www.reddit.com/user/banana_shavings)
 
 
 ## Getting Started
