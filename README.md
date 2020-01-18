@@ -38,7 +38,7 @@ To host your own xkcd bot, follow these simple example steps.
       git clone git@github.com:joeyvanlierop/xkcdbot.git
     
 * Create an app [here](https://www.reddit.com/prefs/apps)
-   * Create a copy of [config.examply.yaml](config.example.yaml)
+   * Create a copy of [config.example.json](xkcdbot/config.example.json) and rename it to config.json
    * Paste the appropritate credentials into the newly created config.py
    * Make sure to also add an appropriate user agent in the config.py
 * Install the requirements
@@ -47,7 +47,9 @@ To host your own xkcd bot, follow these simple example steps.
 
 ### Running the bot
 
-    python3 bot.py
+* Navigate to boy.py and run:
+
+        python3 bot.py
     
 ### Start automatically at reboot
 
@@ -63,6 +65,12 @@ and add this line (replace <path> with path to your local repository)
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
+
+* Task list:
+    - [ ] Blacklisting users through inbox messages
+    - [ ] Implement databases for blacklisted users and statistics
+    - [ ] Match submissions
+    - [ ] Respond to mentions regardless of subreddit
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
