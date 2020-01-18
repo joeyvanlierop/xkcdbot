@@ -1,0 +1,19 @@
+{
+    "default": {
+        "username": "username",
+        "password": "password",
+        "client_id": "client_id",
+        "client_secret": "client_secret",
+        "user_agent": "user_agent",
+        "subreddits": [
+            "xkcd"
+        ],
+        "footers": [
+            "[xkcd.com](https://www.xkcd.com)",
+            "[Feedback](https://reddit.com/message/compose/?to=username&subject=username)",
+            "[Stop Replying](https://reddit.com/message/compose/?to=username&subject=Ignore%20Me&message=Ignore%20Me)",
+            "[GitHub](https://github.com/username/xkcdbot)",
+            "[Programmer](https://www.reddit.com/user/username)"
+        ]
+    }
+}
