@@ -21,7 +21,7 @@ The bot would respond with:
 > [Mobile](http://m.xkcd.com/327)  
 > [Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
 > ---
-> ^[xkcd.com](https://www.xkcd.com)&nbsp;|&nbsp;[Feedback](https://reddit.com/message/compose/?to=banana_shavings&subject=BobbyTablesBot)&nbsp;|&nbsp;[Stop&nbsp;Replying](https://reddit.com/message/compose/?to=BobbyTablesBot&subject=Ignore%20Me&message=Ignore%20Me)&nbsp;|&nbsp;[GitHub](https://github.com/joeyvanlierop/xkcdbot)&nbsp;|&nbsp;[Programmer](https://www.reddit.com/user/banana_shavings)
+> [xkcd.com](https://www.xkcd.com)&nbsp;|&nbsp;[Feedback](https://reddit.com/message/compose/?to=banana_shavings&subject=BobbyTablesBot)&nbsp;|&nbsp;[Stop&nbsp;Replying](https://reddit.com/message/compose/?to=BobbyTablesBot&subject=Ignore%20Me&message=Ignore%20Me)&nbsp;|&nbsp;[GitHub](https://github.com/joeyvanlierop/xkcdbot)&nbsp;|&nbsp;[Programmer](https://www.reddit.com/user/banana_shavings)
 
 
 ## Getting Started
