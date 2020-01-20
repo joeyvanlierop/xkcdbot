@@ -7,11 +7,17 @@ After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why
 
 It is currently running 24/7 in the cloud. You can find the bot at [/u/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
 ## Example
-To use the bot, all you have to do is type the number of the xkcd comic you would like to link in the comment section of any post in /r/xkcd. It is quite conservative with it's matching pattern in order to avoid triggering false positives.
+To use the bot, all you have to do is post a comment in /r/xkcd with the number of the xkcd comic you would like to link prefixed by an exclamation mark (!) or a pound sign (#).
 
 For example, if a comment was submitted saying:
 
-> Show me 327  
+> !327  
+
+or
+> #327 
+
+or even
+> Show me !327
 
 The bot would respond with:
 
