@@ -1,11 +1,11 @@
 import unittest
 import praw
-from xkcdbot.bot import Bot
+from bot.bot import Bot
 
 
 class TestBot(unittest.TestCase):
     def setUp(self):
-        self.bot = Bot(config_path="./test/test_config.json")
+        self.bot = Bot(config_path="test_config.json", section="test")
 
     def test_find_comic(self):
         self.assertIsNone(self.bot.find_comic(-1))
@@ -14,7 +14,7 @@ class TestBot(unittest.TestCase):
 
     def test_find_number(self):
         self.assertEqual(self.bot.find_numbers("Test"), [])
-        self.assertEqual(self.bot.find_numbers("123k/h"), [])
-        self.assertEqual(self.bot.find_numbers("7/ 80. 99"), [])
-        self.assertEqual(self.bot.find_numbers("900h 10000"), ["10000"])
-        self.assertEqual(self.bot.find_numbers("Test 1234 5678 -1"), ["1234", "5678"])
+        self.assertEqual(self.bot.find_numbers("!123."), ["123"])
+        self.assertEqual(self.bot.find_numbers("7/ !80. !99"), ["80", "99"])
+        self.assertEqual(self.bot.find_numbers("!900 10000"), ["900"])
+        self.assertEqual(self.bot.find_numbers("!Test !1234 5678 !-1"), ["1234"])

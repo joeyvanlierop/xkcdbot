@@ -17,22 +17,18 @@ import re
 import praw
 import requests
 import inspect
-from config import Config
+from cfg.config import Config
 
 
 class Bot():
-    def __init__(self, config_path="config.json", blacklisted_path="blacklisted.json", section="default"):
-        package_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(package_dir, config_path)
-        blacklisted_path = os.path.join(package_dir, blacklisted_path)
-
+    def __init__(self, config_path="config.json", section="default", blacklisted_path="blacklisted.db"):
         self.config = Config(config_path, section)
 
     def main(self):
         reddit = self.authenticate()
         subreddits = reddit.subreddit(self.config.subreddits)
         comment_stream = subreddits.stream.comments(
-            pause_after=-1, skip_existing=True)
+            pause_after=-1, skip_existing=False)
         inbox_stream = reddit.inbox.stream(pause_after=-1)
 
         while True:
@@ -47,7 +43,6 @@ class Bot():
                 continue
 
             body = comment.body
-
             comic_ids = self.find_numbers(body)
 
             for comic_id in comic_ids:
@@ -58,8 +53,6 @@ class Bot():
 
                 response = self.format_comment(comic)
                 self.reply(comment, response)
-                comment.save
-                print(response)
 
     def run_inbox_stream(self, reddit, stream):
         for message in stream:
@@ -113,10 +106,9 @@ class Bot():
             return True
 
     def find_numbers(self, body):
-        numbers = re.findall(r"""(?i)(?x)           # Ignore case, comment mode
-                            (?: (?<=\s) | (?<=^))   # Must be preceded by whitespace or the start of a line
-                            (1 \d\d | \d{3,}    )   # The number (must be greater than 100)
-                            (?= \s | $ | .(?=$) )   # Must be followed by whitespace, the end of line, or a lonely dot
+        numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
+                            (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
+                            \d+                 # Matches the following numbers
                             """, body)
         return numbers
 
@@ -158,8 +150,9 @@ class Bot():
         return inspect.cleandoc(response)
 
     def reply(self, comment, response):
-        comment.reply(response)
-        comment.save()
+        print(response)
+        # comment.reply(response)
+        # comment.save()
 
 
 if __name__ == "__main__":

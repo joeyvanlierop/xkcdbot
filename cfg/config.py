@@ -2,9 +2,9 @@ import os
 import json
 
 class Config():
-    def __init__(self, filename, section):
-        package_dir = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(package_dir, filename)
+    def __init__(self, config_path="config.json", section="default"):
+        dirname  = os.path.dirname(os.path.abspath(__file__))
+        filename = os.path.join(dirname, config_path)
 
         with open(filename, "r") as infile:
             config = json.load(infile)[section] or {}
