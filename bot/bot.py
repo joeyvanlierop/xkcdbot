@@ -40,74 +40,101 @@ class Bot():
         Authenticates a new reddit user.
         Cycles between running the comment stream function and the inbox stream function.
         """
-        reddit = self.authenticate()
-        subreddits = reddit.subreddit(self.config.subreddits)
+        self.reddit = self.authenticate()
+
+        subreddits = self.reddit.subreddit(self.config.subreddits)
         comment_stream = subreddits.stream.comments(
-            pause_after=-1, skip_existing=False)
-        inbox_stream = reddit.inbox.stream(pause_after=-1)
+            pause_after=-1, skip_existing=True)
+        inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
-            self.run_comment_stream(reddit, comment_stream)
-            self.run_inbox_stream(reddit, inbox_stream)
+            self.run_stream(inbox_stream, self.handle_inbox)
+            self.run_stream(comment_stream, self.handle_comment)
+
+    def run_stream(self, stream, callback):
+        """
+        Iterates over a PRAW stream
+        Runs the callback with the current item passed as the argument
+
+        The stream should have 'pause_after=-1' so that multiple streams can be iterated
+        """
+        for item in stream:
+            print(callback)
+            if item is None:
+                break
+            callback(item)
 
     def authenticate(self):
         """Returns a new authenticated reddit user with the credentials from the configuration file."""
         reddit = praw.Reddit(username=self.config.username,
-                            password=self.config.password,
-                            client_id=self.config.client_id,
-                            client_secret=self.config.client_secret,
-                            user_agent=self.config.user_agent)
+                             password=self.config.password,
+                             client_id=self.config.client_id,
+                             client_secret=self.config.client_secret,
+                             user_agent=self.config.user_agent)
         return reddit
 
-    def run_comment_stream(self, reddit, stream):
-        """Resposible for calling all the functions which analyze and respond to comments."""
-        for comment in stream:
-            if comment is None:
-                break
-            elif not self.valid_comment(comment):
+    def handle_comment(self, comment, strict_match=True):
+        """Resposible for calling all the functions which analyze and respond to comments in /r/xkcd"""
+        if not self.valid_comment(comment):
+            return
+
+        body = comment.body
+        comic_ids = self.find_numbers(body)
+
+        for comic_id in comic_ids:
+            comic = self.find_comic(comic_id)
+
+            if comic is None:
                 continue
 
-            body = comment.body
-            comic_ids = self.find_numbers(body)
+            response = self.format_comment(comic)
+            self.reply(comment, response)
 
-            for comic_id in comic_ids:
-                comic = self.find_comic(comic_id)
+    def handle_inbox(self, item):
+        """Resposible for calling all the functions which analyze and respond to inbox messages and username mentions."""
+        # Private Message
+        if isinstance(item, praw.models.Message):
+            self.handle_private_message(item)
 
-                if comic is None:
-                    continue
+        # Username Mention
+        if isinstance(item, praw.models.Comment):
+            self.handle_username_mention(item)
 
-                response = self.format_comment(comic)
-                self.reply(comment, response)
+    def handle_private_message(self, message):
+        """
+        Resposible for calling all the functions which analyze and respond to private messages.
+        Adds a user to the blacklisted users database if the private message subject is 'ignore me'.
+        """
+        subject = message.subject.lower()
+        author = message.author()
 
-    def run_inbox_stream(self, reddit, stream):
-        """Resposible for calling all the functions which analyze and respond to inbox messages and mentions."""
-        for message in stream:
-            if message is None:
-                break
+        if subject == "ignore me":
+            self.add_blacklist(author)
 
-            if message.body.lower() == "Ignore Me".lower():
-                print(message.author)
-                # print("\n")
+    def handle_username_mention(self, comment):
+        """
+        Resposible for calling all the functions which analyze and respond to username mentions.
+        Calls handle_comment with the strict matching off.
+        """
+        subject = comment.subject.lower()
+        comment = self.reddit.comment(comment)
 
-    # def get_blacklisted(self):
-    #     return self.config["blacklisted"]
+        if subject == "username mention":
+            self.handle_comment(comment, strict_match=False)
 
-    # def add_blacklist(self, author):
-    #     blacklisted = self.get_blacklisted()
-    #     new_blacklisted = blacklisted.append(author)
+    def add_blacklist(self, username):
+        """
+        Adds a user to the blacklisted user database
+        Will not add if the user is already present in the database
+        """
+        if not self.is_blacklisted(username):
+            # TODO
+            return False
 
-    # def should_blacklist(self, author, message):
-    #     if message.lower() == "Ignore me".lower():
-    #         blacklisted = self.get_blacklisted()
-
-    #         if author not in blacklisted:
-    #             self.add_blacklist(author)
-
-    # def is_blacklisted(self, username):
-    #     with open("config.yaml") as file:
-    #         config = yaml.load(file, Loader=yaml.FullLoader)
-    #         blacklisted = config[self.section]["blacklisted"] or []
-    #         return username in blacklisted
+    def is_blacklisted(self, username):
+        """Returns true if the given username exists in the blacklisted user database"""
+        # TODO
+        return False
 
     def valid_comment(self, comment):
         """
@@ -118,6 +145,7 @@ class Bot():
          - A comment posted by a blacklisted user.
          - A comment that is saved.
         """
+        print(type(comment))
         username = self.config.username
         author = comment.author
         saved = comment.saved
@@ -126,8 +154,8 @@ class Bot():
             return False
         elif saved:
             return False
-        # elif self.is_blacklisted(username):
-        #     return False
+        elif self.is_blacklisted(username):
+            return False
         else:
             return True
 
