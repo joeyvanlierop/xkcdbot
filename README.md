@@ -52,9 +52,15 @@ To host your own xkcd bot, follow these simple example steps.
 
 ### Running the bot
 
-* Navigate to boy.py and run:
+* From the base directory run:
 
-        python3 bot.py
+        python3 -m bot.bot
+        
+### Running the tests
+
+* From the base directory run:
+
+        python3 -m unittest discover
     
 ### Start automatically at reboot
 
