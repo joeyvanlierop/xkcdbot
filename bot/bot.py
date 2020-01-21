@@ -18,6 +18,7 @@ import praw
 import time
 import requests
 import textwrap
+from prawcore.exceptions import ServerError
 from cfg.config import Config
 from db.database import Database
 
@@ -50,8 +51,12 @@ class Bot():
         inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
-            self.run_stream(inbox_stream, self.handle_inbox)
-            self.run_stream(comment_stream, self.handle_comment)
+            try:
+                self.run_stream(inbox_stream, self.handle_inbox)
+                self.run_stream(comment_stream, self.handle_comment)
+            except ServerError as e:
+                print(e)
+                time.sleep(15)
 
     def run_stream(self, stream, callback, sleep_time=5):
         """
