@@ -84,6 +84,7 @@ class Bot():
 
         body = comment.body
         comic_ids = self.find_numbers(body, strict_match)
+        responses = []
 
         for comic_id in comic_ids:
             comic = self.find_comic(comic_id)
@@ -91,8 +92,11 @@ class Bot():
             if comic is None:
                 continue
 
-            response = self.format_comment(comic)
+            response = self.format_response(comic)
+            responses.append(response)
             self.database.increment_id(comic_id)
+
+        if len(responses) > 0:
             self.reply(comment, response)
 
     def handle_inbox(self, item):
@@ -190,7 +194,7 @@ class Bot():
             config = response.json()
             return config
 
-    def format_comment(self, data):
+    def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
         title = data["title"]
         alt = data["alt"]
@@ -210,13 +214,26 @@ class Bot():
         [Mobile]({mobile})
 
         [Explanation]({explain})
-
-        ---
-
-        {self.config.closer}
         """
 
         return inspect.cleandoc(response)
+
+    def combine_responses(self, responses):
+        newline = inspect.cleandoc("""
+        &nbsp;  
+        
+        """)
+
+        closer = inspect.cleandoc(f"""
+        ---
+
+        {self.config.closer}
+        """)
+
+        responses.append(closer)
+        response = newline.join(responses)
+
+        return response
 
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
