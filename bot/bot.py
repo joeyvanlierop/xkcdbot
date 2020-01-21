@@ -177,8 +177,7 @@ class Bot():
                                 \d+                 # Matches the following numbers
                                 """, body)
 
-        # return strip_leading_zeroes(numbers)
-        return ["1", "2", "3"]
+        return strip_leading_zeroes(numbers)
 
     def find_comic(self, number):
         """
