@@ -46,7 +46,7 @@ class Bot():
         self.authenticate()
         subreddits = self.reddit.subreddit(self.config.subreddits)
         comment_stream = subreddits.stream.comments(
-            pause_after=-1, skip_existing=False)
+            pause_after=-1, skip_existing=True)
         inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
