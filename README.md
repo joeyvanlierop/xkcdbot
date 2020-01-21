@@ -9,27 +9,28 @@ It is currently running 24/7 in the cloud. You can find the bot at [/u/BobbyTabl
 ## Example
 There are two ways to use the bot.
 
-The first way is to post a comment in /r/xkcd with the number of the xkcd comic you would like to link prefixed by an exclamation mark (!) or a pound sign (#).
+* The first way is to post a comment in /r/xkcd with the number of the xkcd comic you would like to link prefixed by an exclamation mark (!) or a pound sign (#).  
+  Examples:
 
-> !327  
+  > !327  
 
-or
-> #327 
+  or
+  > #327 
 
-or even
-> Show me !327
+  or even
+  > Show me !327
 
 
-The second way is to mention the bot from any subreddit with the number of the xkcd comic you would like to link. If the bot is mentioned, the comic number does not need to be prefixed.
-For example, if a comment was submitted saying:
+* The second way is to mention the bot from any subreddit with the number of the xkcd comic you would like to link. If the bot is mentioned, the comic number does not need to be prefixed.  
+  Examples:
 
-> /u/BobbyTablesBot 327  
+    > /u/BobbyTablesBot 327  
 
-or
-> #327 
+    or
+    > /u/BobbyTablesBot !327
 
-or even
-> Hey /u/BobbyTablesBot, can you link me 327?
+    or even
+    > Hey /u/BobbyTablesBot, can you link me 327?
 
 In any of the previous cases, the bot would respond with:
 
