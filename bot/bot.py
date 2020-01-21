@@ -51,26 +51,27 @@ class Bot():
         inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
-            try:
                 self.run_stream(inbox_stream, self.handle_inbox)
                 self.run_stream(comment_stream, self.handle_comment)
-            except ServerError as e:
-                print(e)
-                time.sleep(15)
+                
 
-    def run_stream(self, stream, callback, sleep_time=5):
+    def run_stream(self, stream, callback, sleep_time=5, error_sleep_time=30):
         """
         Iterates over a PRAW stream
         Runs the callback with the current item passed as the argument
 
         The stream should have 'pause_after=-1' so that multiple streams can be iterated
         """
-        for item in stream:
-            if item is None:
-                break
-            callback(item)
-
-        time.sleep(sleep_time)
+        try:
+            for item in stream:
+                if item is None:
+                    break
+                callback(item)
+        except ServerError as e:
+            print(e)
+            time.sleep(error_sleep_time)
+        finally:
+            time.sleep(sleep_time)
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
