@@ -230,6 +230,7 @@ class Bot():
         {self.config.closer}
         """)
 
+        print(responses)
         responses.append(closer)
         response = newline.join(responses)
 
