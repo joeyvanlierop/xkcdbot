@@ -87,6 +87,7 @@ Please make sure to update tests as appropriate.
     - [x] Blacklisting users through inbox messages
     - [x] Implement databases for blacklisted users and statistics
     - [x] Respond to mentions regardless of subreddit
+    - [ ] Track comic reference popularity
     - [ ] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
