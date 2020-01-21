@@ -7,9 +7,9 @@ After seeing [this suggestion](https://www.reddit.com/r/xkcd/comments/epmpwv/why
 
 It is currently running 24/7 in the cloud. You can find the bot at [/u/BobbyTablesBot](https://www.reddit.com/user/BobbyTablesBot/).
 ## Example
-To use the bot, all you have to do is post a comment in /r/xkcd with the number of the xkcd comic you would like to link prefixed by an exclamation mark (!) or a pound sign (#).
+There are two ways to use the bot.
 
-For example, if a comment was submitted saying:
+The first way is to post a comment in /r/xkcd with the number of the xkcd comic you would like to link prefixed by an exclamation mark (!) or a pound sign (#).
 
 > !327  
 
@@ -19,7 +19,19 @@ or
 or even
 > Show me !327
 
-The bot would respond with:
+
+The second way is to mention the bot from any subreddit with the number of the xkcd comic you would like to link. If the bot is mentioned, the comic number does not need to be prefixed.
+For example, if a comment was submitted saying:
+
+> /u/BobbyTablesBot 327  
+
+or
+> #327 
+
+or even
+> Hey /u/BobbyTablesBot, can you link me 327?
+
+In any of the previous cases, the bot would respond with:
 
 > **[327:](http://xkcd.com/327)** Exploits of a Mom    
 > **Alt-text:** Her daughter is named Help I'm trapped in a driver's license factory.  
@@ -33,16 +45,13 @@ The bot would respond with:
 ## Getting Started
 
 To host your own xkcd bot, follow these simple example steps.
-    
 
 ### Prerequisites
 
 * Python3
 * A Reddit Account
   
-
 ### Installation
-
 
 * Clone the repo
 
@@ -53,8 +62,8 @@ To host your own xkcd bot, follow these simple example steps.
    * Paste the appropritate credentials into the newly created config.py
    * Make sure to also add an appropriate user agent in the config.py
 * Install the requirements
-
-      pip3 install -r requirements.txt
+    
+        pip3 install -r requirements.txt
 
 ### Running the bot
 
@@ -67,16 +76,6 @@ To host your own xkcd bot, follow these simple example steps.
 * From the base directory run:
 
         python3 -m unittest discover
-    
-### Start automatically at reboot
-
-To start the bot automatically in the background on Linux, add a cronjob with
-
-    crontab -e
-   
-and add this line (replace <path> with path to your local repository)
-
-    @reboot python3 <path>/bot.py &>> /dev/null
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -84,10 +83,11 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 * Task list:
-    - [ ] Blacklisting users through inbox messages
-    - [ ] Implement databases for blacklisted users and statistics
+    - [x] Blacklisting users through inbox messages
+    - [x] Implement databases for blacklisted users and statistics
+    - [x] Respond to mentions regardless of subreddit
+    - [ ] Include statistics in comment
     - [ ] Match submissions (currently only matches comments)
-    - [ ] Respond to mentions regardless of subreddit
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
