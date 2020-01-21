@@ -221,13 +221,12 @@ class Bot():
 
     def combine_responses(self, responses):
         closer = inspect.cleandoc(f"""
-        
         ---
 
         {self.config.closer}
         """)
         
-        newline = inspect.cleandoc("""
+        newline = inspect.cleandoc("""  
 
         &nbsp;  
         
