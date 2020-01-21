@@ -158,6 +158,10 @@ class Bot():
         
         :param
         """
+        def strip_leading_zeroes(numbers):
+            """Removes all leading zeroes from the numbers in the given list"""
+            return [re.sub(r"^0+", "", number) for number in numbers]
+
         numbers = []
 
         if strict_match:
@@ -170,7 +174,7 @@ class Bot():
                                 \d+                 # Matches the following numbers
                                 """, body)
 
-        return numbers
+        return strip_leading_zeroes(numbers)
 
     def find_comic(self, number):
         """
@@ -199,7 +203,7 @@ class Bot():
         response = f"""
         **[{num}:]({link})** {title}  
 
-        **Alt-text:** {alt}  
+        **Alt-text:** >!{alt}<!  
 
         [Image]({img})  
 
