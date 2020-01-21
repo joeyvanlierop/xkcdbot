@@ -2,11 +2,11 @@ import os
 import json
 
 class Config():
-    def __init__(self, config_path="config.json", section="default"):
+    def __init__(self, config_name, section):
         dirname  = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(dirname, config_path)
+        config_path = os.path.join(dirname, config_name)
 
-        with open(filename, "r") as infile:
+        with open(config_path, "r") as infile:
             config = json.load(infile)[section] or {}
             self.username = config["username"]
             self.password = config["password"]

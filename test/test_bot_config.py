@@ -5,7 +5,7 @@ from cfg.config import Config
 
 class TestBotConfig(unittest.TestCase):
     def setUp(self):
-        self.config = Config(config_path="test_config.json", section="test")
+        self.config = Config(config_name="test_config.json", section="test")
 
     def test_constructor(self):
         self.assertEqual(self.config.username, "username")
