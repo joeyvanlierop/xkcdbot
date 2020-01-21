@@ -17,7 +17,7 @@ import re
 import praw
 import time
 import requests
-import inspect
+import textwrap
 from cfg.config import Config
 from db.database import Database
 
@@ -205,29 +205,24 @@ class Bot():
 
         response = f"""
         **[{num}:]({link})** {title}  
-
         **Alt-text:** >!{alt}!<  
-
         [Image]({img})  
-
-        [Mobile]({mobile})
-
-        [Explanation]({explain})
+        [Mobile]({mobile})  
+        [Explanation]({explain})  
         """
 
-        return inspect.cleandoc(response)
+        return textwrap.dedent(response)
 
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
-        doublenewline = "\n\n&nbsp;\n\n"
-        newline = "\n\n"
-        closer = inspect.cleandoc(f"""
-        --- 
+        newline = "\n"
+        closer = textwrap.dedent(f"""
+        ---  
         {self.config.closer}
         """)
 
-        response = doublenewline.join(responses)
-        response += f"{newline} {closer}"
+        responses.append(closer)
+        response = newline.join(responses)
 
         return response
 
