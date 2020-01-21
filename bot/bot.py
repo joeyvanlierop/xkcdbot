@@ -15,9 +15,11 @@ General workflow:
 import os
 import re
 import praw
+import time
 import requests
 import inspect
 from cfg.config import Config
+from db.database import Database
 
 
 class Bot():
@@ -27,11 +29,12 @@ class Bot():
     Constructor arguments:
     :param config_path: Path to the config file within the cfg folder.
     :param section: Section within the config file which hold the settings for the bot.
-    :param backlisted_path: Path to the database which holds the blacklisted users.
+    :param database_path: Path to the database file within the db folder.
     """
 
-    def __init__(self, config_path="config.json", section="default", blacklisted_path="blacklisted.db"):
-        self.config = Config(config_path, section)
+    def __init__(self, config_name="config.json", section="default", database_name="database.db"):
+        self.config = Config(config_name, section)
+        self.database = Database(database_name)
 
     def main(self):
         """
@@ -51,7 +54,7 @@ class Bot():
             self.run_stream(inbox_stream, self.handle_inbox)
             self.run_stream(comment_stream, self.handle_comment)
 
-    def run_stream(self, stream, callback):
+    def run_stream(self, stream, callback, sleep_time=5):
         """
         Iterates over a PRAW stream
         Runs the callback with the current item passed as the argument
@@ -59,10 +62,11 @@ class Bot():
         The stream should have 'pause_after=-1' so that multiple streams can be iterated
         """
         for item in stream:
-            print(callback)
             if item is None:
                 break
             callback(item)
+
+        time.sleep(sleep_time)
 
     def authenticate(self):
         """Returns a new authenticated reddit user with the credentials from the configuration file."""
@@ -79,7 +83,7 @@ class Bot():
             return
 
         body = comment.body
-        comic_ids = self.find_numbers(body)
+        comic_ids = self.find_numbers(body, strict_match)
 
         for comic_id in comic_ids:
             comic = self.find_comic(comic_id)
@@ -88,6 +92,7 @@ class Bot():
                 continue
 
             response = self.format_comment(comic)
+            self.database.increment_id(comic_id)
             self.reply(comment, response)
 
     def handle_inbox(self, item):
@@ -103,38 +108,27 @@ class Bot():
     def handle_private_message(self, message):
         """
         Resposible for calling all the functions which analyze and respond to private messages.
-        Adds a user to the blacklisted users database if the private message subject is 'ignore me'.
+        Adds a user to the blacklisted users database if the private message subject or is 'ignore me' (case-insensitive).
         """
         subject = message.subject.lower()
-        author = message.author()
+        body = message.body.lower()
+        username = message.author.name
 
-        if subject == "ignore me":
-            self.add_blacklist(author)
+        if subject == "ignore me" or body == "ignore me":
+            self.database.add_blacklist(username)
+            message.mark_read()
 
-    def handle_username_mention(self, comment):
+    def handle_username_mention(self, message):
         """
         Resposible for calling all the functions which analyze and respond to username mentions.
         Calls handle_comment with the strict matching off.
         """
-        subject = comment.subject.lower()
-        comment = self.reddit.comment(comment)
+        subject = message.subject.lower()
+        comment = self.reddit.comment(message)
 
         if subject == "username mention":
-            self.handle_comment(comment, strict_match=False)
-
-    def add_blacklist(self, username):
-        """
-        Adds a user to the blacklisted user database
-        Will not add if the user is already present in the database
-        """
-        if not self.is_blacklisted(username):
-            # TODO
-            return False
-
-    def is_blacklisted(self, username):
-        """Returns true if the given username exists in the blacklisted user database"""
-        # TODO
-        return False
+            self.handle_comment(comment, False)
+            message.mark_read()
 
     def valid_comment(self, comment):
         """
@@ -145,26 +139,37 @@ class Bot():
          - A comment posted by a blacklisted user.
          - A comment that is saved.
         """
-        print(type(comment))
-        username = self.config.username
-        author = comment.author
+        bot_username = self.config.username
+        username = comment.author.name
         saved = comment.saved
 
-        if author == username:
+        if username == bot_username:
             return False
         elif saved:
             return False
-        elif self.is_blacklisted(username):
+        elif self.database.is_blacklisted(username):
             return False
         else:
             return True
 
-    def find_numbers(self, body):
-        """Finds all numbers that should be analyzed by the bot."""
-        numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
-                            (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
-                            \d+                 # Matches the following numbers
-                            """, body)
+    def find_numbers(self, body, strict_match):
+        """
+        Finds all numbers that should be analyzed by the bot.
+        
+        :param
+        """
+        numbers = []
+
+        if strict_match:
+            numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
+                                (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
+                                \d+                 # Matches the following numbers
+                                """, body)
+        else:
+            numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode   
+                                \d+                 # Matches the following numbers
+                                """, body)
+
         return numbers
 
     def find_comic(self, number):
@@ -211,9 +216,8 @@ class Bot():
 
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
-        print(response)
-        # comment.reply(response)
-        # comment.save()
+        comment.reply(response)
+        comment.save()
 
 
 if __name__ == "__main__":
