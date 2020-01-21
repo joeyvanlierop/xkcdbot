@@ -43,11 +43,10 @@ class Bot():
         Authenticates a new reddit user.
         Cycles between running the comment stream function and the inbox stream function.
         """
-        self.reddit = self.authenticate()
-
+        self.authenticate()
         subreddits = self.reddit.subreddit(self.config.subreddits)
         comment_stream = subreddits.stream.comments(
-            pause_after=-1, skip_existing=True)
+            pause_after=-1, skip_existing=False)
         inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
@@ -69,13 +68,12 @@ class Bot():
         time.sleep(sleep_time)
 
     def authenticate(self):
-        """Returns a new authenticated reddit user with the credentials from the configuration file."""
-        reddit = praw.Reddit(username=self.config.username,
+        """Authenticates a reddit user with the credentials from the configuration file."""
+        self.reddit = praw.Reddit(username=self.config.username,
                              password=self.config.password,
                              client_id=self.config.client_id,
                              client_secret=self.config.client_secret,
                              user_agent=self.config.user_agent)
-        return reddit
 
     def handle_comment(self, comment, strict_match=True):
         """Resposible for calling all the functions which analyze and respond to comments in /r/xkcd"""
@@ -179,7 +177,8 @@ class Bot():
                                 \d+                 # Matches the following numbers
                                 """, body)
 
-        return strip_leading_zeroes(numbers)
+        # return strip_leading_zeroes(numbers)
+        return ["1", "2", "3"]
 
     def find_comic(self, number):
         """
@@ -208,7 +207,7 @@ class Bot():
         response = f"""
         **[{num}:]({link})** {title}  
 
-        **Alt-text:** >!{alt}<!  
+        **Alt-text:** >!{alt}!<  
 
         [Image]({img})  
 
@@ -220,20 +219,16 @@ class Bot():
         return inspect.cleandoc(response)
 
     def combine_responses(self, responses):
+        """Combines all the responses into a single response with the closer at the end"""
+        doublenewline = "\n\n&nbsp;\n\n"
+        newline = "\n\n"
         closer = inspect.cleandoc(f"""
-        ---
-        \n\n
+        --- 
         {self.config.closer}
         """)
-        
-        newline = inspect.cleandoc("""  
-        \n\n
-        &nbsp;  
-        \n\n
-        """)
 
-        responses.append(closer)
-        response = newline.join(responses)
+        response = doublenewline.join(responses)
+        response += f"{newline} {closer}"
 
         return response
 
