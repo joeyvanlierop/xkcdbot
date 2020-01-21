@@ -88,6 +88,7 @@ Please make sure to update tests as appropriate.
     - [x] Implement databases for blacklisted users and statistics
     - [x] Respond to mentions regardless of subreddit
     - [ ] Include statistics in comment
+    - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
 
 ## License
