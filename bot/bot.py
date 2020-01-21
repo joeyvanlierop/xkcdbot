@@ -220,18 +220,19 @@ class Bot():
         return inspect.cleandoc(response)
 
     def combine_responses(self, responses):
-        newline = inspect.cleandoc("""
-        &nbsp;  
-        
-        """)
-
         closer = inspect.cleandoc(f"""
+        
         ---
 
         {self.config.closer}
         """)
+        
+        newline = inspect.cleandoc("""
 
-        print(responses)
+        &nbsp;  
+        
+        """)
+
         responses.append(closer)
         response = newline.join(responses)
 
