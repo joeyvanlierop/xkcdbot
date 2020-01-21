@@ -87,10 +87,11 @@ Please make sure to update tests as appropriate.
     - [x] Blacklisting users through inbox messages
     - [x] Implement databases for blacklisted users and statistics
     - [x] Respond to mentions regardless of subreddit
-    - [ ] Track comic reference popularity
     - [ ] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
+    - [ ] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
+    - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
