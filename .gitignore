@@ -9,6 +9,5 @@ venv/
 # Sensitive configuration files
 config.json
 
-# Databases
-database.db
-statistics.db
+# Database
+*.db
