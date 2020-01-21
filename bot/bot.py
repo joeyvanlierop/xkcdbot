@@ -97,6 +97,7 @@ class Bot():
             self.database.increment_id(comic_id)
 
         if len(responses) > 0:
+            response = self.combine_responses(responses)
             self.reply(comment, response)
 
     def handle_inbox(self, item):
