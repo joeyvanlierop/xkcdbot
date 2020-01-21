@@ -194,6 +194,8 @@ class Bot():
 
         if response.status_code == 404:
             return None
+        elif response is None:
+            return None
         else:
             config = response.json()
             return config
