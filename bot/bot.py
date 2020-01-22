@@ -244,10 +244,7 @@ class Bot():
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
         newline = "\n"
-        closer = textwrap.dedent(f"""
-        ---  
-        {self.config.closer}
-        """)
+        closer = self._closer()
 
         # In case the method was called with more responses than the bot is configured to submit,
         # truncate this list.
@@ -258,11 +255,17 @@ class Bot():
 
         return response
 
+    def _closer(self):
+        return textwrap.dedent(f"""
+        ---  
+        {self.config.closer}
+        """)
+
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
-        if len(comment) >= RESPONSE_CHAR_LIMIT:
+        if len(response) >= RESPONSE_CHAR_LIMIT:
             # Probably a good idea to log errors instead of printing, but won't include that in this PR.
-            print(f'Comment size {len(comment)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
+            print(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
                   f'saving and skipping.')
             comment.save()
             return
