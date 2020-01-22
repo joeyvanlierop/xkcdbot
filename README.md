@@ -87,12 +87,15 @@ Please make sure to update tests as appropriate.
     - [x] Blacklisting users through inbox messages
     - [x] Implement databases for blacklisted users and statistics
     - [x] Respond to mentions regardless of subreddit
+    - [x] [Remove duplicate entries](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7k8mg/)
     - [ ] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
-    - [ ] [Remove duplicate entries](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7k8mg/)
     - [ ] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
+    - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
+    - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
+    - [ ] [Open on explainxkcd](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff81kky/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
