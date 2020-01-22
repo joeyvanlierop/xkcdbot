@@ -1,20 +1,23 @@
 import os
 import sqlite3
 from sqlite3 import Error
+from datetime import datetime
+from contextlib import closing
 
 
 blacklisted_table = "blacklisted"
 statistics_table = "statistics"
-create_blacklisted_table =  f"""
+create_blacklisted_table = f"""
                             CREATE TABLE IF NOT EXISTS {blacklisted_table} (
-                                username VARCHAR (40) PRIMARY KEY
+                                username VARCHAR (40) NOT NULL PRIMARY KEY
                             );
                             """
-create_statistics_table =   f"""
+create_statistics_table = f"""
                             CREATE TABLE IF NOT EXISTS {statistics_table} (
-                                id      VARCHAR  PRIMARY KEY,
-                                count   INT      DEFAULT 1,
-                                updated DATETIME DEFAULT (DATETIME('now'))
+                                id         INTEGER      PRIMARY KEY,
+                                comment_id VARCHAR (10) NOT NULL,
+                                comic_id   VARCHAR      NOT NULL,
+                                date       DATETIME     DEFAULT (DATETIME('now'))
                             );
                             """
 
@@ -27,8 +30,6 @@ class Database():
             dirname = os.path.dirname(os.path.abspath(__file__))
             database_path = os.path.join(dirname, database_name)
             self.connection = self.__create_connection(database_path)
-
-        self.cursor = self.connection.cursor()
 
         if self.connection:
             self.__create_table(create_blacklisted_table)
@@ -57,17 +58,18 @@ class Database():
         :param create_table_sql: A CREATE TABLE statement
         :return:
         """
-        try:
-            self.cursor.execute(create_table_sql)
-        except Error as e:
-            print(e)
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                cursor.execute(create_table_sql)
+            except Error as e:
+                print(e)
 
     def add_blacklist(self, username):
         """
         Adds a user to the blacklisted user database
         Will not add if the user is already present in the database
         """
-        sql =   f"""
+        sql = f"""
                 INSERT INTO {blacklisted_table}
                     (username)
                 VALUES
@@ -75,52 +77,55 @@ class Database():
                 """
 
         if not self.is_blacklisted(username):
-            self.cursor.execute(sql, (username,))
-            self.connection.commit()
+            with closing(self.connection.cursor()) as cursor:
+                cursor.execute(sql, (username,))
+                self.connection.commit()
 
     def is_blacklisted(self, username):
         """Returns true if the given username exists in the blacklisted user database"""
-        sql =   f"""
+        sql = f"""
                 SELECT *
                 FROM {blacklisted_table}
                 WHERE username = ?
                 """
-        
-        self.cursor.execute(sql, (username,))
-        return self.cursor.fetchone() is not None
 
-    def increment_id(self, id):
-        """
-        Increments the count of the given id by 1
-        Updates the updated value to the current time
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql, (username,))
+            return cursor.fetchone() is not None
 
-        Adds the given id if it does not exist
+    def add_id(self, comment_id, comic_id, date=None):
         """
-        sql =   f"""
+        Adds the given id to the table with the given datetime
+        If no datetime is given, the current datetime (in UTC) is used
+
+        :param date: The datetime to associate the id with
+        """
+        sql = f"""
                 INSERT INTO {statistics_table}
-                    (id)
+                    (comment_id, comic_id, date)
                 VALUES
-                    (?)
-                ON CONFLICT(id) DO UPDATE SET
-                    count = count + 1,
-                    updated = DATETIME('now')
+                    (?, ?, ?)
                 """
+        if not date:
+            date = datetime.utcnow()
+            
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql, (comment_id, comic_id, date))
+            self.connection.commit()
 
-        self.cursor.execute(sql, (id,))
-        self.connection.commit()
-
-    def get_id_statistics(self, id):
+    def comic_id_count(self, comic_id):
         """
         Returns statistics of the given id
-        
+
         The first value is the amount of times the given id has been referenced
         The second value is the last time the the given id was been referenced
         """
-        sql =   f"""
-                SELECT count, updated
+        sql = f"""
+                SELECT COUNT(*)
                 FROM {statistics_table}
-                WHERE id = ?
+                WHERE comic_id = ?
                 """
-        
-        self.cursor.execute(sql, (id,))
-        return self.cursor.fetchone()
+
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql, (comic_id,))
+            return cursor.fetchone()[0]
