@@ -261,8 +261,10 @@ class Bot():
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
         if len(comment) >= RESPONSE_CHAR_LIMIT:
-            # Probably a good idea to log errors, but won't include that in this PR.
-            print(f'Comment size {len(comment)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, discarding.')
+            # Probably a good idea to log errors instead of printing, but won't include that in this PR.
+            print(f'Comment size {len(comment)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
+                  f'saving and skipping.')
+            comment.save()
             return
         comment.reply(response)
         comment.save()
