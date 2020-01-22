@@ -1,11 +1,12 @@
 import unittest
-import praw
+import datetime
+from datetime import datetime
 from db.database import Database
 
 
 class TestDatabase(unittest.TestCase):
     def setUp(self):
-        self.database = Database(database_name=":memory:")
+        self.database = Database(":memory:")
 
     def test_blacklist(self):
         self.database.add_blacklist("username1")
@@ -15,14 +16,16 @@ class TestDatabase(unittest.TestCase):
         self.assertFalse(self.database.is_blacklisted("username3"))
         self.assertFalse(self.database.is_blacklisted(""))
 
-    def test_id_statistics(self):
-        self.database.increment_id("1")
-        self.database.increment_id("2")
-        self.database.increment_id("2")
-        self.database.increment_id("3")
-        self.database.increment_id("3")
-        self.database.increment_id("3")
-        self.assertIsNone(self.database.get_id_statistics("0"))
-        self.assertEqual(self.database.get_id_statistics("1")[0], 1)
-        self.assertEqual(self.database.get_id_statistics("2")[0], 2)
-        self.assertEqual(self.database.get_id_statistics("3")[0], 3)
+    def test_statistics(self):
+        date = datetime.utcnow()
+        self.database.add_id("abc", "1")
+        self.database.add_id("def", "2")
+        self.database.add_id("ghi", "2")
+        self.database.add_id("jkl", "3", date)
+        self.database.add_id("mno", "3", date)
+        self.database.add_id("pqr", "3", date)
+        self.database.add_id("stu", "3", date)
+        self.assertEqual(self.database.comic_id_count("0"), 0)
+        self.assertEqual(self.database.comic_id_count("1"), 1)
+        self.assertEqual(self.database.comic_id_count("2"), 2)
+        self.assertEqual(self.database.comic_id_count("3"), 4)

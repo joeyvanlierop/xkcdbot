@@ -30,12 +30,12 @@ class Bot():
 
     Constructor arguments:
     :param config_path: Path to the config file within the cfg folder.
-    :param section: Section within the config file which hold the settings for the bot.
+    :param config_section: config_section within the config file which hold the settings for the bot.
     :param database_path: Path to the database file within the db folder.
     """
 
-    def __init__(self, config_name="config.json", section="default", database_name="database.db"):
-        self.config = Config(config_name, section)
+    def __init__(self, config_name="config.json", config_section="default", database_name="database.db"):
+        self.config = Config(config_name, config_section)
         self.database = Database(database_name)
 
     def main(self):
@@ -87,6 +87,7 @@ class Bot():
         if not self.valid_comment(comment):
             return
 
+        comment_id = comment.id
         body = comment.body
         comic_ids = self.find_numbers(body, strict_match)
         responses = []
@@ -99,7 +100,7 @@ class Bot():
 
             response = self.format_response(comic)
             responses.append(response)
-            self.database.increment_id(comic_id)
+            self.database.add_id(comment_id, comic_id)
 
         if len(responses) > 0:
             response = self.combine_responses(responses)

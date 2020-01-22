@@ -5,7 +5,7 @@ from bot.bot import Bot
 
 class TestBot(unittest.TestCase):
     def setUp(self):
-        self.bot = Bot(config_name="test_config.json", section="test")
+        self.bot = Bot("test_config.json", "test")
 
     def test_find_comic(self):
         self.assertIsNone(self.bot.find_comic(-1))
