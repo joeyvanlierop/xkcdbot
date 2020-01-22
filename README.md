@@ -96,6 +96,7 @@ Please make sure to update tests as appropriate.
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [ ] [Open on explainxkcd](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff81kky/)
+    - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
