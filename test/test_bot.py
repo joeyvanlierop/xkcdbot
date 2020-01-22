@@ -1,6 +1,18 @@
 import unittest
 import praw
-from bot.bot import Bot
+from bot.bot import Bot, RESPONSE_CHAR_LIMIT, RESPONSE_COUNT_LIMIT
+
+
+class CommentMock:
+    def __init__(self):
+        self.reply_called = 0
+        self.save_called = 0
+
+    def reply(self, response):
+        self.reply_called += 1
+
+    def save(self):
+        self.save_called += 1
 
 
 class TestBot(unittest.TestCase):
@@ -25,3 +37,24 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot.find_numbers("07/ !080. !00099 99 0099", False), ["7", "80", "99"])
         self.assertEqual(self.bot.find_numbers("!900 010000", False), ["900", "10000"])
         self.assertEqual(self.bot.find_numbers("!Test !1234 5678 !-1", False), ["1234", "5678", "1"])
+
+    def test_response_size_limited(self):
+        comment = CommentMock()
+        too_big_response = ''.join(['1' for _ in range(RESPONSE_CHAR_LIMIT + 1)])
+        self.bot.reply(comment=comment, response=too_big_response)
+        self.assertEqual(comment.reply_called, 0, f'Expected no reply() call, saw {comment.reply_called}')
+        self.assertEqual(comment.save_called, 1, f'Expected 1 save() call, saw {comment.save_called}')
+
+    def test_combine_responses_truncates_response(self):
+        # There may be a less fragile way of constructing this test, but this will test the
+        # functionality.
+        too_many_responses = [f'1' for _ in range(RESPONSE_COUNT_LIMIT + 1)]
+        expected_combined_response_length = \
+            len('\n'.join(too_many_responses[:RESPONSE_COUNT_LIMIT])) + \
+            len(self.bot._closer()) + len('\n')
+        actual_combined_response = self.bot.combine_responses(responses=too_many_responses)
+        self.assertEqual(
+            len(actual_combined_response),
+            expected_combined_response_length,
+            f'Expected response of length {expected_combined_response_length}, found {len(actual_combined_response)}'
+        )
