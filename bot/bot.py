@@ -145,9 +145,11 @@ class Bot():
         Calls handle_comment with the strict matching off.
         """
         subject = message.subject.lower()
+        body = message.body.lower()
+        username = self.config.username.lower()
         comment = self.reddit.comment(message)
 
-        if subject == "username mention":
+        if subject == "username mention" or username in body:
             self.handle_comment(comment, False)
             message.mark_read()
 
