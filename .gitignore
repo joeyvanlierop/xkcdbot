@@ -11,3 +11,9 @@ config.json
 
 # Database
 *.db
+
+# IntelliJ
+.idea
+
+# virtualenv
+env/
