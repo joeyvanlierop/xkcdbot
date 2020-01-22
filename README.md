@@ -88,10 +88,10 @@ Please make sure to update tests as appropriate.
     - [x] Implement databases for blacklisted users and statistics
     - [x] Respond to mentions regardless of subreddit
     - [x] [Remove duplicate entries](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7k8mg/)
+    - [x] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
     - [ ] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
-    - [ ] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
