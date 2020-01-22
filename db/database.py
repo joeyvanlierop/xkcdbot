@@ -93,24 +93,27 @@ class Database():
             cursor.execute(sql, (username,))
             return cursor.fetchone() is not None
 
-    def add_id(self, comment_id, comic_id, date=None):
+    def add_id(self, comment_id, comic_id):
         """
         Adds the given id to the table with the given datetime
         If no datetime is given, the current datetime (in UTC) is used
 
-        :param date: The datetime to associate the id with
+        :param comment_id: The id of the comment to add
+        :param comment_id: The id of the comic to add
+        :param comment_id: The datetime of the comment to add - Temporarily removed
         """
+        # if not date:
+        #     date = datetime.utcnow()
+        # date.strftime('%Y-%m-%d %H:%M:%S')
         sql = f"""
                 INSERT INTO {statistics_table}
-                    (comment_id, comic_id, date)
+                    (comment_id, comic_id)
                 VALUES
-                    (?, ?, ?)
+                    (?, ?)
                 """
-        if not date:
-            date = datetime.utcnow()
-            
+        
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(sql, (comment_id, comic_id, date))
+            cursor.execute(sql, (comment_id, comic_id))
             self.connection.commit()
 
     def comic_id_count(self, comic_id):
