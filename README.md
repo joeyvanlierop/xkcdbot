@@ -90,6 +90,7 @@ Please make sure to update tests as appropriate.
     - [ ] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
+    - [ ] [Remove duplicate entries](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7k8mg/)
     - [ ] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
 
