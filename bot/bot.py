@@ -18,6 +18,7 @@ import praw
 import time
 import requests
 import textwrap
+from collections import OrderedDict
 from prawcore.exceptions import ServerError
 from cfg.config import Config
 from db.database import Database
@@ -171,7 +172,15 @@ class Bot():
             """Removes all leading zeroes from the numbers in the given list"""
             return [re.sub(r"^0+", "", number) for number in numbers]
 
-        numbers = []
+        def remove_duplicates(numbers):
+            """Removes all duplicate numbers in the given list"""
+            unique_numbers = []
+            
+            for number in numbers:
+                if number not in unique_numbers:
+                    unique_numbers.append(number)
+
+            return unique_numbers
 
         if strict_match:
             numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
@@ -183,7 +192,9 @@ class Bot():
                                 \d+                 # Matches the following numbers
                                 """, body)
 
-        return strip_leading_zeroes(numbers)
+        stripped_numbers = strip_leading_zeroes(numbers)
+        unique_numbers = remove_duplicates(stripped_numbers)
+        return unique_numbers
 
     def find_comic(self, number):
         """
