@@ -14,14 +14,14 @@ class TestBot(unittest.TestCase):
 
     def test_find_number_strict(self):
         self.assertEqual(self.bot.find_numbers("Test", True), [])
-        self.assertEqual(self.bot.find_numbers("!123.", True), ["123"])
-        self.assertEqual(self.bot.find_numbers("7/ !080. !99", True), ["80", "99"])
+        self.assertEqual(self.bot.find_numbers("!123 !123", True), ["123"])
+        self.assertEqual(self.bot.find_numbers("7? !080. !99", True), ["80", "99"])
         self.assertEqual(self.bot.find_numbers("!900 10000", True), ["900"])
         self.assertEqual(self.bot.find_numbers("!Test !001234 5678 !-1", True), ["1234"])
 
     def test_find_number_non_strict(self):
         self.assertEqual(self.bot.find_numbers("Test", False), [])
         self.assertEqual(self.bot.find_numbers("!123.", False), ["123"])
-        self.assertEqual(self.bot.find_numbers("07/ !080. !00099", False), ["7", "80", "99"])
+        self.assertEqual(self.bot.find_numbers("07/ !080. !00099 99 0099", False), ["7", "80", "99"])
         self.assertEqual(self.bot.find_numbers("!900 010000", False), ["900", "10000"])
         self.assertEqual(self.bot.find_numbers("!Test !1234 5678 !-1", False), ["1234", "5678", "1"])
