@@ -12,21 +12,19 @@ General workflow:
 * Reply
 """
 
-import os
 import re
-import praw
-import time
-import requests
 import textwrap
-from collections import OrderedDict
+import time
+
+import praw
+import requests
 from prawcore.exceptions import ServerError
+
 from cfg.config import Config
 from db.database import Database
 
-
 RESPONSE_COUNT_LIMIT: int = 10
 RESPONSE_CHAR_LIMIT: int = 10_000
-
 
 
 class Bot():
@@ -57,9 +55,8 @@ class Bot():
         inbox_stream = self.reddit.inbox.stream(pause_after=-1)
 
         while True:
-                self.run_stream(inbox_stream, self.handle_inbox)
-                self.run_stream(comment_stream, self.handle_comment)
-                
+            self.run_stream(inbox_stream, self.handle_inbox)
+            self.run_stream(comment_stream, self.handle_comment)
 
     def run_stream(self, stream, callback, sleep_time=5, error_sleep_time=30):
         """
@@ -82,10 +79,10 @@ class Bot():
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
         self.reddit = praw.Reddit(username=self.config.username,
-                             password=self.config.password,
-                             client_id=self.config.client_id,
-                             client_secret=self.config.client_secret,
-                             user_agent=self.config.user_agent)
+                                  password=self.config.password,
+                                  client_id=self.config.client_id,
+                                  client_secret=self.config.client_secret,
+                                  user_agent=self.config.user_agent)
 
     def handle_comment(self, comment, strict_match=True):
         """Resposible for calling all the functions which analyze and respond to comments in /r/xkcd"""
@@ -177,6 +174,7 @@ class Bot():
         
         :param
         """
+
         def strip_leading_zeroes(numbers):
             """Removes all leading zeroes from the numbers in the given list"""
             return [re.sub(r"^0+", "", number) for number in numbers]
@@ -184,7 +182,7 @@ class Bot():
         def remove_duplicates(numbers):
             """Removes all duplicate numbers in the given list"""
             unique_numbers = []
-            
+
             for number in numbers:
                 if number not in unique_numbers:
                     unique_numbers.append(number)
