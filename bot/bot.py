@@ -85,7 +85,11 @@ class Bot():
                                   user_agent=self.config.user_agent)
 
     def handle_comment(self, comment, strict_match=True):
-        """Resposible for calling all the functions which analyze and respond to comments in /r/xkcd"""
+        """
+        Resposible for calling all the functions which analyze and respond to comments in /r/xkcd
+        
+        :param strict_match: Passed as an argument to the find_numbers method
+        """
         if not self.valid_comment(comment):
             return
 
@@ -173,7 +177,9 @@ class Bot():
         """
         Finds all numbers that should be analyzed by the bot.
         
-        :param
+        :param strict_match: Decides whether to use strict matching or not
+         - If using strict matching, all numbers must be preceded by an exclamation mark or a pound sign
+         - If using non-strict matching, all numbers are valid
         """
 
         def strip_leading_zeroes(numbers):
