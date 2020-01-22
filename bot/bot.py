@@ -24,6 +24,11 @@ from cfg.config import Config
 from db.database import Database
 
 
+RESPONSE_COUNT_LIMIT: int = 10
+RESPONSE_CHAR_LIMIT: int = 10_000
+
+
+
 class Bot():
     """
     Class that contains the methods for running the bot.
@@ -92,6 +97,10 @@ class Bot():
         responses = []
 
         for comic_id in comic_ids:
+            if len(responses) >= RESPONSE_COUNT_LIMIT:
+                # Don't process more comics than the bot should include in the response.
+                break
+
             comic = self.find_comic(comic_id)
 
             if comic is None:
@@ -240,6 +249,10 @@ class Bot():
         {self.config.closer}
         """)
 
+        # In case the method was called with more responses than the bot is configured to submit,
+        # truncate this list.
+        responses = responses[:RESPONSE_COUNT_LIMIT]
+
         responses.append(closer)
         response = newline.join(responses)
 
@@ -247,6 +260,10 @@ class Bot():
 
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
+        if len(comment) >= RESPONSE_CHAR_LIMIT:
+            # Probably a good idea to log errors, but won't include that in this PR.
+            print(f'Comment size {len(comment)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, discarding.')
+            return
         comment.reply(response)
         comment.save()
 
