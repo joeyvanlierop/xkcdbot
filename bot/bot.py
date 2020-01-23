@@ -241,21 +241,19 @@ class Bot():
         total_count = self.database.total_reference_count()
         percentage = comic_count / total_count * 100
 
-        response = f"""
+        response = textwrap.dedent(f"""  
         **[{num}:]({link})** {title}  
         **Alt-text:** >!{alt}!<  
         [Image]({img})  
         [Mobile]({mobile})  
-        [Explanation]({explain})
-        """
+        [Explanation]({explain})  
+        """)
 
         if comic_count > 0:
-            response_statistics = f"""  
-            This comic has been referenced {comic_count} times, making up {percentage}% of all references
-            """
+            response_statistics = f"\n\tThis comic has been referenced {comic_count} time{'s' if comic_count > 1 else ''}, representing {percentage:.2f}% of all references."
             response += response_statistics
 
-        return textwrap.dedent(response)
+        return response
 
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
