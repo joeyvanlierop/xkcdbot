@@ -97,7 +97,7 @@ Please make sure to update tests as appropriate.
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [ ] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
-    - [ ] [!latest/!relevant](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
+    - [ ] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
