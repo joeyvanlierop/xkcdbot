@@ -116,12 +116,22 @@ class Database():
             cursor.execute(sql, (comment_id, comic_id))
             self.connection.commit()
 
+    def total_reference_count(self):
+        """
+        Returns the total amount of comics that have been referenced
+        """
+        sql = f"""
+                SELECT COUNT(*)
+                FROM {statistics_table}
+                """
+
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql)
+            return cursor.fetchone()[0]
+
     def comic_id_count(self, comic_id):
         """
-        Returns statistics of the given id
-
-        The first value is the amount of times the given id has been referenced
-        The second value is the last time the the given id was been referenced
+        Returns the total amount of times the given id has been referenced
         """
         sql = f"""
                 SELECT COUNT(*)

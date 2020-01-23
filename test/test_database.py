@@ -28,3 +28,4 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(self.database.comic_id_count("1"), 1)
         self.assertEqual(self.database.comic_id_count("2"), 2)
         self.assertEqual(self.database.comic_id_count("3"), 4)
+        self.assertEqual(self.database.total_reference_count(), 7)
