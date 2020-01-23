@@ -95,7 +95,6 @@ Please make sure to update tests as appropriate.
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
-    - [ ] [Open on explainxkcd](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff81kky/)
     - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [ ] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
     - [ ] [!latest/!relevant](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
