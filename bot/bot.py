@@ -25,6 +25,7 @@ from db.database import Database
 
 RESPONSE_COUNT_LIMIT: int = 10
 RESPONSE_CHAR_LIMIT: int = 10_000
+LATEST=0
 
 
 class Bot():
@@ -97,6 +98,9 @@ class Bot():
         body = comment.body
         comic_ids = self.find_numbers(body, strict_match)
         responses = []
+        latest = self.find_latest(body, strict_match)
+        if latest:
+            comic_ids.append(LATEST)
 
         for comic_id in comic_ids:
             if len(responses) >= RESPONSE_COUNT_LIMIT:
@@ -110,7 +114,7 @@ class Bot():
 
             response = self.format_response(comic)
             responses.append(response)
-            self.database.add_id(comment_id, comic_id)
+            self.database.add_id(comment_id, comic["num"])
 
         if len(responses) > 0:
             response = self.combine_responses(responses)
@@ -212,12 +216,28 @@ class Bot():
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
-    def find_comic(self, number):
+    def find_latest(self, body, strict_match):
+        """
+        Finds 'latest' in the body and returns True if it is.
+
+        :param strict_match: Using the same rules as find_numbers
+        """
+        if strict_match:
+            latest = re.findall(r"""(?i)(?<= ! | \# )latest""", body)
+        else:
+            latest = re.findall(r"""(?i)latest""", body)
+
+        return bool(latest)
+
+    def find_comic(self, number=LATEST):
         """
         Finds the json data of the comic with the given number.
         Returns none if there is no comic with the given number.
         """
-        url = f"http://xkcd.com/{number}/info.0.json"
+        if number is LATEST:
+            url = f"http://xkcd.com/info.0.json"
+        else:
+            url = f"http://xkcd.com/{number}/info.0.json"
         response = requests.get(url)
 
         if response.status_code == 404:
