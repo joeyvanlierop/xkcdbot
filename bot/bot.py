@@ -237,14 +237,23 @@ class Bot():
         link = f"http://xkcd.com/{num}"
         mobile = f"http://m.xkcd.com/{num}"
         explain = f"http://www.explainxkcd.com/wiki/index.php/{num}"
+        comic_count = self.database.comic_id_count(num)
+        total_count = self.database.total_reference_count()
+        percentage = comic_count / total_count * 100
 
         response = f"""
         **[{num}:]({link})** {title}  
         **Alt-text:** >!{alt}!<  
         [Image]({img})  
         [Mobile]({mobile})  
-        [Explanation]({explain})  
+        [Explanation]({explain})
         """
+
+        if comic_count > 0:
+            response_statistics = f"""  
+            This comic has been referenced {comic_count} times, making up {percentage}% of all references
+            """
+            response += response_statistics
 
         return textwrap.dedent(response)
 
