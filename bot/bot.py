@@ -241,7 +241,9 @@ class Bot():
         url = f"http://xkcd.com/{number}/info.0.json"
         response = requests.get(url)
 
-        if response.status_code == 404:
+        if number == 404:
+            return {"title": "Not Found", "alt": "", "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png", "num": 404}
+        elif response.status_code == 404:
             return None
         elif response is None:
             return None
