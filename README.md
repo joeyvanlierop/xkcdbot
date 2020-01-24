@@ -92,6 +92,7 @@ Please make sure to update tests as appropriate.
     - [x] Include statistics in comment
     - [ ] Implement logging
     - [ ] Match submissions (currently only matches comments)
+    - [ ] Space out items slightly more to accommodate mobile devices
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
