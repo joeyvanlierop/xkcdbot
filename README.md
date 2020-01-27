@@ -99,6 +99,7 @@ Please make sure to update tests as appropriate.
     - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [ ] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
     - [ ] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
+    - [ ] [Ignore hyperlinks](https://www.reddit.com/r/xkcd/comments/eut0e2/xkcd_2260_reaction_maps/ffrd5jo/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
