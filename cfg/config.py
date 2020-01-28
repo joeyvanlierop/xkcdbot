@@ -2,7 +2,7 @@ import os
 import json
 import logging
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -12,7 +12,7 @@ class Config():
         config_path = os.path.join(dirname, config_name)
 
         with open(config_path, "r") as infile:
-            logger.debug(f"Generating config")
+            logger.info(f"Generating config")
             config = json.load(infile)[config_section] or {}
             self.username = config["username"]
             self.password = config["password"]
@@ -22,4 +22,4 @@ class Config():
             self.subreddits = "+".join(config["subreddits"])
             self.closer = "^" + \
                 " | ".join(config["footers"]).replace(" ", "&nbsp;")
-            logger.debug(f"Generated config for user: {self.username}")
+            logger.info(f"Generated config for user: {self.username}")

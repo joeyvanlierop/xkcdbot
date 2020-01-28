@@ -27,7 +27,7 @@ from db.database import Database
 RESPONSE_COUNT_LIMIT: int = 10
 RESPONSE_CHAR_LIMIT: int = 10_000
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -82,7 +82,7 @@ class Bot():
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
-        logger.debug(f"Authenticating user: {self.config.username}")
+        logger.info(f"Authenticating user: {self.config.username}")
         self.reddit = praw.Reddit(username=self.config.username,
                                   password=self.config.password,
                                   client_id=self.config.client_id,
@@ -123,7 +123,7 @@ class Bot():
 
     def handle_inbox(self, item):
         """Resposible for calling all the functions which analyze and respond to inbox messages and username mentions."""
-        logger.debug("Received inbox item")
+        logger.info("Received inbox item")
         
         # Private Message
         if isinstance(item, praw.models.Message):
@@ -141,11 +141,11 @@ class Bot():
         subject = message.subject.lower()
         body = message.body.lower()
         username = message.author.name
-        logger.debug(
+        logger.info(
             f"Received private message\nSubject: {subject}\nBody: {body}")
 
         if subject == "ignore me" or body == "ignore me":
-            logger.debug(f"{username} has requested to be blacklisted")
+            logger.info(f"{username} has requested to be blacklisted")
             self.database.add_blacklist(username)
             message.mark_read()
 
@@ -160,7 +160,7 @@ class Bot():
         comment = self.reddit.comment(message)
 
         if subject == "username mention" or username in body:
-            logger.debug(f"Received username mention\nBody: {body}")
+            logger.info(f"Received username mention\nBody: {body}")
             self.handle_comment(comment, False)
             message.mark_read()
 
@@ -178,16 +178,16 @@ class Bot():
         saved = comment.saved
 
         if username == bot_username:
-            logger.debug(f"Found comment from bot: {comment}")
+            logger.info(f"Found comment from bot: {comment}")
             return False
         elif saved:
-            logger.debug(f"Found previously saved comment: {comment}")
+            logger.info(f"Found previously saved comment: {comment}")
             return False
         elif self.database.is_blacklisted(username):
-            logger.debug(f"Found comment from blacklisted user: {username}")
+            logger.info(f"Found comment from blacklisted user: {username}")
             return False
         else:
-            logger.debug(f"Found valid comment: {comment}")
+            logger.info(f"Found valid comment: {comment}")
             return True
 
     def match_token(self, token, body, strict_match):
@@ -257,7 +257,7 @@ class Bot():
         response = requests.get(url)
 
         if number == 404:
-            logger.debug("Got comic with number 404")
+            logger.info("Got comic with number 404")
             return {"title": "Not Found",
                     "alt": "",
                     "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png",
@@ -269,7 +269,7 @@ class Bot():
             logger.warn(f"Comic {number} returned none")
             return None
         else:
-            logger.debug(f"Got comic with number {number}")
+            logger.info(f"Got comic with number {number}")
             config = response.json()
             return config
 
@@ -286,13 +286,13 @@ class Bot():
             logger.warn(f"Latest comic returned none")
             return None
         else:
-            logger.debug(f"Got latest comic")
+            logger.info(f"Got latest comic")
             config = response.json()
             return config["num"]
 
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
-        logger.debug(f"Formatting response for data: {data}")
+        logger.info(f"Formatting response for data: {data}")
         title = data["title"]
         alt = data["alt"]
         img = data["img"]
@@ -320,7 +320,7 @@ class Bot():
 
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
-        logger.debug(f"Combining responses: {responses}")
+        logger.info(f"Combining responses: {responses}")
         newline = "\n"
         closer = self._closer()
 
@@ -347,7 +347,7 @@ class Bot():
             comment.save()
             return
         
-        logger.debug(f"Saving and replying to {comment} with: {response}")
+        logger.info(f"Saving and replying to {comment} with: {response}")
         comment.reply(response)
         comment.save()
 
