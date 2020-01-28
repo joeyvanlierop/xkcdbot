@@ -1,4 +1,5 @@
 import os
+import logging
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
@@ -20,6 +21,7 @@ create_statistics_table = f"""
                                 date       DATETIME     DEFAULT (DATETIME('now'))
                             );
                             """
+logger = logging.getLogger(__name__)
 
 
 class Database():
@@ -45,10 +47,11 @@ class Database():
         connection = None
 
         try:
+            logger.debug(f"Opening database at: {database_path}")
             connection = sqlite3.connect(database_path)
             return connection
         except Error as e:
-            print(e)
+            logger.error(e)
 
     def __create_table(self, create_table_sql):
         """
@@ -60,9 +63,10 @@ class Database():
         """
         with closing(self.connection.cursor()) as cursor:
             try:
+                logger.debug("Creating sql table")
                 cursor.execute(create_table_sql)
             except Error as e:
-                print(e)
+                logger.log(e)
 
     def add_blacklist(self, username):
         """
@@ -77,6 +81,7 @@ class Database():
                 """
 
         if not self.is_blacklisted(username):
+            logger.debug("Adding {username} to blacklist")
             with closing(self.connection.cursor()) as cursor:
                 cursor.execute(sql, (username,))
                 self.connection.commit()
@@ -89,6 +94,7 @@ class Database():
                 WHERE username = ?
                 """
 
+        logger.debug("Checking if {username} is blacklisted")
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(sql, (username,))
             return cursor.fetchone() is not None
@@ -99,8 +105,8 @@ class Database():
         If no datetime is given, the current datetime (in UTC) is used
 
         :param comment_id: The id of the comment to add
-        :param comment_id: The id of the comic to add
-        :param comment_id: The datetime of the comment to add - Temporarily removed
+        :param comic_id: The id of the comic to add
+        :param date: The datetime of the comment to add - Temporarily removed
         """
         # if not date:
         #     date = datetime.utcnow()
@@ -111,8 +117,10 @@ class Database():
                 VALUES
                     (?, ?)
                 """
-        
+
         with closing(self.connection.cursor()) as cursor:
+            logger.debug(
+                f"Adding comment {comment_id} with comic {comic_id} to database")
             cursor.execute(sql, (comment_id, comic_id))
             self.connection.commit()
 
@@ -126,6 +134,7 @@ class Database():
                 """
 
         with closing(self.connection.cursor()) as cursor:
+            logger.debug("Returning total count of all comic references")
             cursor.execute(sql)
             return cursor.fetchone()[0]
 
@@ -140,5 +149,6 @@ class Database():
                 """
 
         with closing(self.connection.cursor()) as cursor:
+            logger.debug(f"Returning reference count of comic {comic_id}")
             cursor.execute(sql, (comic_id,))
             return cursor.fetchone()[0]

@@ -13,8 +13,9 @@ General workflow:
 """
 
 import re
-import textwrap
 import time
+import logging
+import textwrap
 
 import praw
 import requests
@@ -25,6 +26,7 @@ from db.database import Database
 
 RESPONSE_COUNT_LIMIT: int = 10
 RESPONSE_CHAR_LIMIT: int = 10_000
+logger = logging.getLogger(__name__)
 
 
 class Bot():
@@ -71,13 +73,14 @@ class Bot():
                     break
                 callback(item)
         except ServerError as e:
-            print(e)
+            logger.error(e)
             time.sleep(error_sleep_time)
         finally:
             time.sleep(sleep_time)
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
+        logger.debug(f"Authenticating user: {self.config.username}")
         self.reddit = praw.Reddit(username=self.config.username,
                                   password=self.config.password,
                                   client_id=self.config.client_id,
@@ -87,7 +90,7 @@ class Bot():
     def handle_comment(self, comment, strict_match=True):
         """
         Resposible for calling all the functions which analyze and respond to comments in /r/xkcd
-        
+
         :param strict_match: Passed as an argument to the match_numbers method
         """
         if not self.valid_comment(comment):
@@ -118,6 +121,8 @@ class Bot():
 
     def handle_inbox(self, item):
         """Resposible for calling all the functions which analyze and respond to inbox messages and username mentions."""
+        logger.debug("Received inbox item")
+        
         # Private Message
         if isinstance(item, praw.models.Message):
             self.handle_private_message(item)
@@ -134,8 +139,11 @@ class Bot():
         subject = message.subject.lower()
         body = message.body.lower()
         username = message.author.name
+        logger.debug(
+            f"Received private message\nSubject: {subject}\nBody: {body}")
 
         if subject == "ignore me" or body == "ignore me":
+            logger.debug(f"{username} has requested to be blacklisted")
             self.database.add_blacklist(username)
             message.mark_read()
 
@@ -150,6 +158,7 @@ class Bot():
         comment = self.reddit.comment(message)
 
         if subject == "username mention" or username in body:
+            logger.debug(f"Received username mention\nBody: {body}")
             self.handle_comment(comment, False)
             message.mark_read()
 
@@ -167,12 +176,16 @@ class Bot():
         saved = comment.saved
 
         if username == bot_username:
+            logger.debug(f"Found comment from bot: {comment}")
             return False
         elif saved:
+            logger.debug(f"Found previously saved comment: {comment}")
             return False
         elif self.database.is_blacklisted(username):
+            logger.debug(f"Found comment from blacklisted user: {username}")
             return False
         else:
+            logger.debug(f"Found valid comment: {comment}")
             return True
 
     def match_token(self, token, body, strict_match):
@@ -197,7 +210,7 @@ class Bot():
     def match_numbers(self, body, strict_match):
         """
         Matches all numbers (including !latest) that should be analyzed by the bot.
-        
+
         :param strict_match: Decides whether to use strict matching or not
          - If using strict matching, all numbers must be preceded by an exclamation mark or a pound sign
          - If using non-strict matching, all numbers are valid
@@ -235,19 +248,26 @@ class Bot():
 
     def get_comic(self, number):
         """
-        Gets the json data of the comic with the given number.
+        Gets the JSON data of the comic with the given number.
         Returns none if there is no comic with the given number.
         """
         url = f"http://xkcd.com/{number}/info.0.json"
         response = requests.get(url)
 
         if number == 404:
-            return {"title": "Not Found", "alt": "", "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png", "num": 404}
+            logger.debug("Got comic with number 404")
+            return {"title": "Not Found",
+                    "alt": "",
+                    "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png",
+                    "num": 404}
         elif response.status_code == 404:
+            logger.warn(f"Comic {number} returned a 404 status code")
             return None
         elif response is None:
+            logger.warn(f"Comic {number} returned none")
             return None
         else:
+            logger.debug(f"Got comic with number {number}")
             config = response.json()
             return config
 
@@ -258,15 +278,19 @@ class Bot():
         url = f"http://xkcd.com/info.0.json"
         response = requests.get(url)
         if response.status_code == 404:
+            logger.warn(f"Latest comic returned a 404 status code")
             return None
         elif response is None:
+            logger.warn(f"Latest comic returned none")
             return None
         else:
+            logger.debug(f"Got latest comic")
             config = response.json()
             return config["num"]
 
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
+        logger.debug(f"Formatting response for data: {data}")
         title = data["title"]
         alt = data["alt"]
         img = data["img"]
@@ -294,6 +318,7 @@ class Bot():
 
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
+        logger.debug(f"Combining responses: {responses}")
         newline = "\n"
         closer = self._closer()
 
@@ -315,11 +340,12 @@ class Bot():
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
         if len(response) >= RESPONSE_CHAR_LIMIT:
-            # Probably a good idea to log errors instead of printing, but won't include that in this PR.
-            print(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
+            logger.warn(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
                   f'saving and skipping.')
             comment.save()
             return
+        
+        logger.debug(f"Saving and replying to {comment} with: {response}")
         comment.reply(response)
         comment.save()
 

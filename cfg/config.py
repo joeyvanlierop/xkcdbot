@@ -1,5 +1,9 @@
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Config():
     def __init__(self, config_name, config_section):
@@ -7,6 +11,7 @@ class Config():
         config_path = os.path.join(dirname, config_name)
 
         with open(config_path, "r") as infile:
+            logger.debug(f"Generating config")
             config = json.load(infile)[config_section] or {}
             self.username = config["username"]
             self.password = config["password"]
@@ -16,3 +21,4 @@ class Config():
             self.subreddits = "+".join(config["subreddits"])
             self.closer = "^" + \
                 " | ".join(config["footers"]).replace(" ", "&nbsp;")
+            logger.debug(f"Generated config for user: {self.username}")
