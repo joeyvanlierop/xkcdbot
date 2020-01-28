@@ -90,7 +90,8 @@ Please make sure to update tests as appropriate.
     - [x] [Remove duplicate entries](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7k8mg/)
     - [x] [Track comic reference popularity](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff75nen/)
     - [x] Include statistics in comment
-    - [ ] Implement logging
+    - [x] Implement logging
+    - [x] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
     - [ ] Match submissions (currently only matches comments)
     - [ ] Space out items slightly more to accommodate mobile devices
     - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
@@ -98,8 +99,8 @@ Please make sure to update tests as appropriate.
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [ ] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
-    - [ ] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
     - [ ] [Ignore hyperlinks](https://www.reddit.com/r/xkcd/comments/eut0e2/xkcd_2260_reaction_maps/ffrd5jo/)
+    - [ ] [Call bot with "Relevant xkcd: {}"](https://www.reddit.com/r/AskReddit/comments/eunqex/you_are_able_to_choose_1_statistic_to_see_above/fft653g/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
