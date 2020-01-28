@@ -26,6 +26,8 @@ from db.database import Database
 
 RESPONSE_COUNT_LIMIT: int = 10
 RESPONSE_CHAR_LIMIT: int = 10_000
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

@@ -21,6 +21,8 @@ create_statistics_table = f"""
                                 date       DATETIME     DEFAULT (DATETIME('now'))
                             );
                             """
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
