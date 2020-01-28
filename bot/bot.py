@@ -259,7 +259,7 @@ class Bot():
         if number == "404":
             logger.info("Got comic with number 404")
             return {"title": "Not Found",
-                    "alt": "",
+                    "alt": "&nbsp;",
                     "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png",
                     "num": 404}
         elif response.status_code == 404:
