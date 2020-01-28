@@ -88,14 +88,14 @@ class Bot():
         """
         Resposible for calling all the functions which analyze and respond to comments in /r/xkcd
         
-        :param strict_match: Passed as an argument to the find_numbers method
+        :param strict_match: Passed as an argument to the match_numbers method
         """
         if not self.valid_comment(comment):
             return
 
         comment_id = comment.id
         body = comment.body
-        comic_ids = self.find_numbers(body, strict_match)
+        comic_ids = self.match_numbers(body, strict_match)
         responses = []
 
         for comic_id in comic_ids:
@@ -103,14 +103,14 @@ class Bot():
                 # Don't process more comics than the bot should include in the response.
                 break
 
-            comic = self.find_comic(comic_id)
+            comic = self.get_comic(comic_id)
 
             if comic is None:
                 continue
 
             response = self.format_response(comic)
             responses.append(response)
-            self.database.add_id(comment_id, comic_id)
+            self.database.add_id(comment_id, comic["num"])
 
         if len(responses) > 0:
             response = self.combine_responses(responses)
@@ -175,9 +175,28 @@ class Bot():
         else:
             return True
 
-    def find_numbers(self, body, strict_match):
+    def match_token(self, token, body, strict_match):
         """
-        Finds all numbers that should be analyzed by the bot.
+        Matches all tokens that should be analyzed by the bot.
+
+        :param strict_match: Decides whether to use strict matching or not
+         - If using strict matching, all tokens must be preceded by an exclamation mark or a pound sign
+         - If using non-strict matching, all tokens are valid
+        """
+        if strict_match:
+            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
+                                (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
+                                {}                  # Matches the following token
+                                """.format(token), body)
+        else:
+            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
+                                {}                  # Matches the following token
+                                """.format(token),  body)
+        return matches
+
+    def match_numbers(self, body, strict_match):
+        """
+        Matches all numbers (including !latest) that should be analyzed by the bot.
         
         :param strict_match: Decides whether to use strict matching or not
          - If using strict matching, all numbers must be preceded by an exclamation mark or a pound sign
@@ -198,24 +217,25 @@ class Bot():
 
             return unique_numbers
 
-        if strict_match:
-            numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
-                                (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
-                                \d+                 # Matches the following numbers
-                                """, body)
-        else:
-            numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode   
-                                \d+                 # Matches the following numbers
-                                """, body)
-
+        numbers = self.match_token('\d+', body, strict_match)
         stripped_numbers = strip_leading_zeroes(numbers)
+        if self.match_latest(body, strict_match):
+            stripped_numbers.append(self.get_latest_comic())
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
-    def find_comic(self, number):
+    def match_latest(self, body, strict_match):
         """
-        Finds the json data of the comic with the given number.
-        Returns a specially constructed json object for comic 404.
+        Matches 'latest' in the body and returns True if it is.
+
+        :param strict_match: Using the same rules as match_numbers
+        """
+        latest = self.match_token('latest', body, strict_match)
+        return bool(latest)
+
+    def get_comic(self, number):
+        """
+        Gets the json data of the comic with the given number.
         Returns none if there is no comic with the given number.
         """
         url = f"http://xkcd.com/{number}/info.0.json"
@@ -230,6 +250,20 @@ class Bot():
         else:
             config = response.json()
             return config
+
+    def get_latest_comic(self):
+        """
+        Returns the ID of the latest comic.
+        """
+        url = f"http://xkcd.com/info.0.json"
+        response = requests.get(url)
+        if response.status_code == 404:
+            return None
+        elif response is None:
+            return None
+        else:
+            config = response.json()
+            return config["num"]
 
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
