@@ -104,8 +104,8 @@ class Bot():
         responses = []
 
         for comic_id in comic_ids:
-            if len(responses) >= RESPONSE_COUNT_LIMIT:
-                # Don't process more comics than the bot should include in the response.
+            if len(responses) > RESPONSE_COUNT_LIMIT:
+                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic(comic_id)
@@ -256,17 +256,17 @@ class Bot():
         url = f"http://xkcd.com/{number}/info.0.json"
         response = requests.get(url)
 
-        if number == 404:
+        if number == "404":
             logger.info("Got comic with number 404")
             return {"title": "Not Found",
                     "alt": "",
                     "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png",
                     "num": 404}
         elif response.status_code == 404:
-            logger.warn(f"Comic {number} returned a 404 status code")
+            logger.warning(f"Comic {number} returned a 404 status code")
             return None
         elif response is None:
-            logger.warn(f"Comic {number} returned none")
+            logger.warning(f"Comic {number} returned none")
             return None
         else:
             logger.info(f"Got comic with number {number}")
@@ -280,10 +280,10 @@ class Bot():
         url = f"http://xkcd.com/info.0.json"
         response = requests.get(url)
         if response.status_code == 404:
-            logger.warn(f"Latest comic returned a 404 status code")
+            logger.warning(f"Latest comic returned a 404 status code")
             return None
         elif response is None:
-            logger.warn(f"Latest comic returned none")
+            logger.warning(f"Latest comic returned none")
             return None
         else:
             logger.info(f"Got latest comic")
@@ -292,7 +292,6 @@ class Bot():
 
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
-        logger.info(f"Formatting response for data: {data}")
         title = data["title"]
         alt = data["alt"]
         img = data["img"]
@@ -303,6 +302,7 @@ class Bot():
         comic_count = self.database.comic_id_count(num)
         total_count = self.database.total_reference_count()
         percentage = comic_count / total_count * 100
+        logger.info(f"Formatting response for comic: {num}")
 
         response = textwrap.dedent(f"""  
         **[{num}:]({link})** {title}  
@@ -320,7 +320,7 @@ class Bot():
 
     def combine_responses(self, responses):
         """Combines all the responses into a single response with the closer at the end"""
-        logger.info(f"Combining responses: {responses}")
+        logger.info(f"Combining {len(responses)} responses")
         newline = "\n"
         closer = self._closer()
 
@@ -342,12 +342,12 @@ class Bot():
     def reply(self, comment, response):
         """Replies to the given comment with the given response."""
         if len(response) >= RESPONSE_CHAR_LIMIT:
-            logger.warn(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
+            logger.warning(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
                   f'saving and skipping.')
             comment.save()
             return
         
-        logger.info(f"Saving and replying to {comment} with: {response}")
+        logger.info(f"Saving and replying to {comment}")
         comment.reply(response)
         comment.save()
 
