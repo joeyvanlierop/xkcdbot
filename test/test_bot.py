@@ -30,10 +30,24 @@ class TestBot(unittest.TestCase):
 
     def test_match_numbers_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", True), [])
+        self.assertEqual(self.bot.match_numbers("!Test !001234 5678 !-1", True), [])
+
         self.assertEqual(self.bot.match_numbers("!123 !123", True), ["123"])
         self.assertEqual(self.bot.match_numbers("7? !080. !99", True), ["80", "99"])
         self.assertEqual(self.bot.match_numbers("!900 10000", True), ["900"])
-        self.assertEqual(self.bot.match_numbers("!Test !001234 5678 !-1", True), ["1234"])
+        
+        self.assertEqual(self.bot.match_numbers("!1234", true), ["1234"])
+        self.assertEqual(self.bot.match_numbers("#1234", true), ["1234"])
+        self.assertEqual(self.bot.match_numbers("Let's look at !1234", true), ["1234"])
+        self.assertEqual(self.bot.match_numbers("Let's look at #1234.", true), ["1234"])
+        self.assertEqual(self.bot.match_numbers("some text (!1234) some more", true), ["1234"])
+
+        self.assertEqual(self.bot.match_numbers()"I spent $123.45 today", true), [])
+        self.assertEqual(self.bot.match_numbers()"Comic #12345 doesn't exist", true), [])
+        self.assertEqual(self.bot.match_numbers()"website.com/?=!1234", true), [])
+        self.assertEqual(self.bot.match_numbers()"website.com/?=#1234", true), [])
+        self.assertEqual(self.bot.match_numbers()"I have made a mistake referencing this xkcd#1234", true), [])
+        self.assertEqual(self.bot.match_numbers()"some junk -> a^698f7%s@ !123a*b@3", true), [])
 
     def test_find_numbers_non_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", False), [])
