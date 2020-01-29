@@ -83,7 +83,7 @@ class Database():
                 """
 
         if not self.is_blacklisted(username):
-            logger.info("Adding {username} to blacklist")
+            logger.info(f"Adding {username} to blacklist")
             with closing(self.connection.cursor()) as cursor:
                 cursor.execute(sql, (username,))
                 self.connection.commit()
@@ -96,7 +96,7 @@ class Database():
                 WHERE username = ?
                 """
 
-        logger.info("Checking if {username} is blacklisted")
+        logger.info(f"Checking if {username} is blacklisted")
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(sql, (username,))
             return cursor.fetchone() is not None
