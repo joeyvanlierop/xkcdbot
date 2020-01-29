@@ -199,7 +199,7 @@ class Bot():
          - If using non-strict matching, all tokens are valid
         """
         if strict_match:
-            numbers = re.findall(r"""(?i)(?x)           # Ignore case, comment mode
+            matches = re.findall(r"""(?i)(?x)           # Ignore case, comment mode
                                 (?<= ^! | \s! | \(!     # Must be preceded by whitespace, line start, or open paren
                                     ^\# | \s\# | \(! )  # and an exlaimation mark or pound sign
                                 {}                      # Match token
@@ -207,7 +207,7 @@ class Bot():
                                 """.format(token), body)
 
         else:
-            numbers = re.findall(r"""(?i)(?x)       # Ignore case, comment mode   
+            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode   
                                 {}                  # Match token
                                 """.format(token), body)
 
