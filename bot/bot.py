@@ -199,14 +199,18 @@ class Bot():
          - If using non-strict matching, all tokens are valid
         """
         if strict_match:
-            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
-                                (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
-                                {}                  # Matches the following token
+            matches = re.findall(r"""(?i)(?x)           # Ignore case, comment mode
+                                (?<= ^! | \s! | \(!     # Must be preceded by whitespace, line start, or open paren
+                                    ^\# | \s\# | \(! )  # and an exlaimation mark or pound sign
+                                {}                      # Match token
+                                (?= \b )                # Match only on a word boundary
                                 """.format(token), body)
+
         else:
-            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
-                                {}                  # Matches the following token
-                                """.format(token),  body)
+            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode   
+                                {}                  # Match token
+                                """.format(token), body)
+
         return matches
 
     def match_numbers(self, body, strict_match):
@@ -232,7 +236,7 @@ class Bot():
 
             return unique_numbers
 
-        numbers = self.match_token('\d+', body, strict_match)
+        numbers = self.match_token('\d{1,4}', body, strict_match)
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
