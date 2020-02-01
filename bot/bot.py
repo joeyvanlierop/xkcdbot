@@ -225,11 +225,11 @@ class Bot():
         def remove_duplicates(numbers):
             """Removes all duplicate numbers in the given list"""
             unique_numbers = []
-
-            for number in numbers:
-                if number not in unique_numbers:
-                    unique_numbers.append(number)
-
+            seen = set()
+            for num in numbers:
+                if num not in seen:
+                    unique_numbers.append(num)
+                    seen.add(num)
             return unique_numbers
 
         numbers = self.match_token('\d+', body, strict_match)
