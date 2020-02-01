@@ -16,7 +16,7 @@ import re
 import time
 import logging
 import textwrap
-
+import numpy as np
 import praw
 import requests
 from prawcore.exceptions import ServerError
@@ -248,6 +248,18 @@ class Bot():
         latest = self.match_token('latest', body, strict_match)
         return bool(latest)
 
+    def match_random(self, body, strict_match):
+        """
+        Matches 'random' in the body and returns a list of random comic indices
+
+        :param strict_match: Using the same rules as match_numbers
+        """
+        random = self.match_token('random', body, strict_match)
+        latest = self.get_latest_comic()
+        res = []
+        for _ in range(len(random)):
+            res.append(np.random.randint(1, latest))
+        return res
     def get_comic(self, number):
         """
         Gets the JSON data of the comic with the given number.
