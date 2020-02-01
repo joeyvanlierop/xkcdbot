@@ -236,6 +236,9 @@ class Bot():
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
+        rand = self.match_random(body, strict_match)
+        if rand:
+            stripped_numbers.extend(rand)
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
@@ -258,7 +261,7 @@ class Bot():
         latest = self.get_latest_comic()
         res = []
         for _ in range(len(random)):
-            res.append(np.random.randint(1, latest))
+            res.append(str(np.random.randint(1, latest)))
         return res
     def get_comic(self, number):
         """
