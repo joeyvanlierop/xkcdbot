@@ -232,7 +232,15 @@ class Bot():
 
             return unique_numbers
 
+        def read_range(range_str):
+            r = range_str.split('.')
+            lo, hi = int(r[0]), int(r[-1])
+            return map(str, list(range(lo,hi+1)))
+
         numbers = self.match_token('\d+', body, strict_match)
+        ranges = self.match_token(r"\d+\.{2,3}\d+", body, strict_match)
+        for rng in ranges:
+            numbers.extend(read_range(rng))
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
