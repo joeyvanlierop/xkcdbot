@@ -77,6 +77,7 @@ class Bot():
         except ServerError as e:
             logger.error(e)
             time.sleep(error_sleep_time)
+            self.authenticate()
         finally:
             time.sleep(sleep_time)
 
