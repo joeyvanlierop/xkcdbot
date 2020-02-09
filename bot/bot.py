@@ -16,9 +16,9 @@ import re
 import time
 import logging
 import textwrap
-import numpy as np
 import praw
 import requests
+from random import randrange
 from prawcore.exceptions import ServerError
 
 from cfg.config import Config
@@ -233,7 +233,7 @@ class Bot():
                     seen.add(num)
             return unique_numbers
 
-        numbers = self.match_token('\d+', body, strict_match)
+        numbers = self.match_token(r"\d+", body, strict_match)
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
@@ -262,7 +262,7 @@ class Bot():
         latest = self.get_latest_comic()
         res = []
         for _ in range(len(random)):
-            res.append(str(np.random.randint(1, latest)))
+            res.append(randrange(1, latest))
         return res
     def get_comic(self, number):
         """
