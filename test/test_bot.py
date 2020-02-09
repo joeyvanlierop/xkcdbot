@@ -34,6 +34,7 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot.match_numbers("7? !080. !99", True), ["80", "99"])
         self.assertEqual(self.bot.match_numbers("!900 10000", True), ["900"])
         self.assertEqual(self.bot.match_numbers("!Test !001234 5678 !-1", True), ["1234"])
+        self.assertEqual(len(self.bot.match_numbers("!random random", True)), 1)
 
     def test_find_numbers_non_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", False), [])
@@ -41,6 +42,7 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot.match_numbers("07/ !080. !00099 99 0099", False), ["7", "80", "99"])
         self.assertEqual(self.bot.match_numbers("!900 010000", False), ["900", "10000"])
         self.assertEqual(self.bot.match_numbers("!Test !1234 5678 !-1", False), ["1234", "5678", "1"])
+        self.assertEqual(len(self.bot.match_numbers("!random random", False)), 2)
 
     def test_response_size_limited(self):
         comment = CommentMock()

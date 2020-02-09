@@ -16,7 +16,7 @@ import re
 import time
 import logging
 import textwrap
-
+import numpy as np
 import praw
 import requests
 from prawcore.exceptions import ServerError
@@ -226,17 +226,20 @@ class Bot():
         def remove_duplicates(numbers):
             """Removes all duplicate numbers in the given list"""
             unique_numbers = []
-
-            for number in numbers:
-                if number not in unique_numbers:
-                    unique_numbers.append(number)
-
+            seen = set()
+            for num in numbers:
+                if num not in seen:
+                    unique_numbers.append(num)
+                    seen.add(num)
             return unique_numbers
 
         numbers = self.match_token('\d+', body, strict_match)
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
+        rand = self.match_random(body, strict_match)
+        if rand:
+            stripped_numbers.extend(rand)
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
@@ -249,6 +252,18 @@ class Bot():
         latest = self.match_token('latest', body, strict_match)
         return bool(latest)
 
+    def match_random(self, body, strict_match):
+        """
+        Matches 'random' in the body and returns a list of random comic indices
+
+        :param strict_match: Using the same rules as match_numbers
+        """
+        random = self.match_token('random', body, strict_match)
+        latest = self.get_latest_comic()
+        res = []
+        for _ in range(len(random)):
+            res.append(str(np.random.randint(1, latest)))
+        return res
     def get_comic(self, number):
         """
         Gets the JSON data of the comic with the given number.
