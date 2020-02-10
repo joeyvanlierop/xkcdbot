@@ -62,7 +62,7 @@ class Bot():
             self.run_stream(inbox_stream, self.handle_inbox)
             self.run_stream(comment_stream, self.handle_comment)
 
-    def run_stream(self, stream, callback, sleep_time=5):
+    def run_stream(self, stream, callback, sleep_time=5, error_sleep_time=15):
         """
         Iterates over a PRAW stream
         Runs the callback with the current item passed as the argument
@@ -76,6 +76,8 @@ class Bot():
                 callback(item)
         except ServerError as e:
             logger.error(e)
+            time.sleep(error_sleep_time)
+            self.run_stream(stream, callback)
         finally:
             time.sleep(sleep_time)
 
