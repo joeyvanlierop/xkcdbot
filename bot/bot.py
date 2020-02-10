@@ -235,8 +235,8 @@ class Bot():
         stripped_numbers = strip_leading_zeroes(numbers)
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
-        rand = self.match_random(body, strict_match)
         if rand:
+            rand = self.match_random(body, strict_match)
             stripped_numbers.extend(rand)
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
