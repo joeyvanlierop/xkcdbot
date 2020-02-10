@@ -235,11 +235,14 @@ class Bot():
 
         numbers = self.match_token(r"\d+", body, strict_match)
         stripped_numbers = strip_leading_zeroes(numbers)
+
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
+        rand = self.match_random(body, strict_match)
+
         if rand:
-            rand = self.match_random(body, strict_match)
             stripped_numbers.extend(rand)
+            
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
@@ -259,11 +262,16 @@ class Bot():
         :param strict_match: Using the same rules as match_numbers
         """
         random = self.match_token('random', body, strict_match)
+
+        if not random:
+            return None
+
         latest = self.get_latest_comic()
         res = []
         for _ in range(len(random)):
             res.append(randrange(1, latest))
         return res
+
     def get_comic(self, number):
         """
         Gets the JSON data of the comic with the given number.
