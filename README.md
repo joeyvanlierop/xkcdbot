@@ -93,8 +93,8 @@ Please make sure to update tests as appropriate.
     - [x] Implement logging
     - [x] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
     - [x] [Ignore hyperlinks](https://www.reddit.com/r/xkcd/comments/eut0e2/xkcd_2260_reaction_maps/ffrd5jo/)
+    - [x] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
     - [ ] Match submissions (currently only matches comments)
-    - [ ] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [ ] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
