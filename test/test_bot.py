@@ -64,3 +64,13 @@ class TestBot(unittest.TestCase):
             expected_combined_response_length,
             f'Expected response of length {expected_combined_response_length}, found {len(actual_combined_response)}'
         )
+
+    def test_urlescape(self):
+        expected = """
+**[859:](http://xkcd.com/859)** (  
+**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+[Image](https://imgs.xkcd.com/comics/%28.png)  
+[Mobile](http://m.xkcd.com/859)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+"""
+        self.assertEqual(self.bot.format_response(self.bot.get_comic(859)), expected)
