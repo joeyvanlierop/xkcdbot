@@ -46,7 +46,7 @@ class Bot():
         self.config = Config(config_name, config_section)
         self.database = Database(database_name)
 
-    def main(self):
+    def main(self, error_sleep_time=15):
         """
         Starts running the bot.
 
@@ -55,32 +55,31 @@ class Bot():
         """
         self.authenticate()
         subreddits = self.reddit.subreddit(self.config.subreddits)
-        comment_stream = subreddits.stream.comments(
-            pause_after=-1, skip_existing=False)
-        inbox_stream = self.reddit.inbox.stream(pause_after=-1)
-
         while True:
-            self.run_stream(inbox_stream, self.handle_inbox)
-            self.run_stream(comment_stream, self.handle_comment)
+            comment_stream = subreddits.stream.comments(
+                pause_after=-1, skip_existing=False)
+            inbox_stream = self.reddit.inbox.stream(pause_after=-1)
+            try:
+                while True:
+                    self.run_stream(inbox_stream, self.handle_inbox)
+                    self.run_stream(comment_stream, self.handle_comment)
+            except ServerError as e:
+                logger.error(e)
+                time.sleep(error_sleep_time)
 
-    def run_stream(self, stream, callback, sleep_time=5, error_sleep_time=15):
+    def run_stream(self, stream, callback, sleep_time=5):
         """
         Iterates over a PRAW stream
         Runs the callback with the current item passed as the argument
 
         The stream should have 'pause_after=-1' so that multiple streams can be iterated
         """
-        try:
-            for item in stream:
-                if item is None:
-                    break
-                callback(item)
-        except ServerError as e:
-            logger.error(e)
-            time.sleep(error_sleep_time)
-            self.run_stream(stream, callback)
-        finally:
-            time.sleep(sleep_time)
+        for item in stream:
+            if item is None:
+                break
+            callback(item)
+        time.sleep(sleep_time)
+        
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
@@ -107,7 +106,8 @@ class Bot():
 
         for comic_id in comic_ids:
             if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                logger.warning(
+                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic(comic_id)
@@ -126,7 +126,7 @@ class Bot():
     def handle_inbox(self, item):
         """Resposible for calling all the functions which analyze and respond to inbox messages and username mentions."""
         logger.info("Received inbox item")
-        
+
         # Private Message
         if isinstance(item, praw.models.Message):
             self.handle_private_message(item)
@@ -243,7 +243,7 @@ class Bot():
 
         if rand:
             stripped_numbers.extend(rand)
-            
+
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
@@ -318,8 +318,10 @@ class Bot():
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
         title = data["title"]
-        alt = data["alt"].replace("!<", "!\u200b<") # Zero width space doesn't end the spoiler
-        img = urllib.parse.quote(data["img"], safe="/:") # These will not break a markdown link
+        # Zero width space doesn't end the spoiler
+        alt = data["alt"].replace("!<", "!\u200b<")
+        # These will not break a markdown link
+        img = urllib.parse.quote(data["img"], safe="/:")
         num = data["num"]
         link = f"http://xkcd.com/{num}"
         mobile = f"http://m.xkcd.com/{num}"
@@ -368,10 +370,10 @@ class Bot():
         """Replies to the given comment with the given response."""
         if len(response) >= RESPONSE_CHAR_LIMIT:
             logger.warning(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
-                  f'saving and skipping.')
+                           f'saving and skipping.')
             comment.save()
             return
-        
+
         logger.info(f"Saving and replying to {comment}")
         comment.reply(response)
         comment.save()
