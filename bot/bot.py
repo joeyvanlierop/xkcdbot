@@ -18,6 +18,7 @@ import logging
 import textwrap
 import praw
 import requests
+import urllib.parse
 from random import randrange
 from prawcore.exceptions import ServerError
 
@@ -317,8 +318,8 @@ class Bot():
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
         title = data["title"]
-        alt = data["alt"]
-        img = data["img"]
+        alt = data["alt"].replace("!<", "!\u200b<") # Zero width space doesn't end the spoiler
+        img = urllib.parse.quote(data["img"], safe="/:") # These will not break a markdown link
         num = data["num"]
         link = f"http://xkcd.com/{num}"
         mobile = f"http://m.xkcd.com/{num}"
