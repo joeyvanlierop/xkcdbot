@@ -175,6 +175,9 @@ class Bot():
          - A comment posted by a blacklisted user.
          - A comment that is saved.
         """
+        if comment is None:
+            return False
+
         bot_username = self.config.username
         username = comment.author.name
         saved = comment.saved
