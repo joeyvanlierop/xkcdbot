@@ -77,7 +77,13 @@ class Bot():
         for item in stream:
             if item is None:
                 break
-            callback(item)
+
+            # Just a try/except to stop the bot from crashing if one message throws an error
+            try:
+                callback(item)
+            except:
+                logger.error(f"Error while handling message item!")
+            
         time.sleep(sleep_time)
         
 
