@@ -14,7 +14,6 @@ General workflow:
 
 import re
 import time
-import json
 import logging
 import textwrap
 import praw
@@ -136,6 +135,8 @@ class Bot():
             comic = self.get_comic_by_title(comic_title)
 
             if comic is None:
+                continue
+            elif str(comic["num"]) in comic_ids:     # check if comic is a duplicate
                 continue
 
             self.database.add_id(comment_id, comic["num"])
