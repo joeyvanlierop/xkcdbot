@@ -14,6 +14,7 @@ General workflow:
 
 import re
 import time
+import json
 import logging
 import textwrap
 import praw
@@ -77,9 +78,10 @@ class Bot():
         for item in stream:
             if item is None:
                 break
+
             callback(item)
+
         time.sleep(sleep_time)
-        
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
@@ -102,6 +104,7 @@ class Bot():
         comment_id = comment.id
         body = comment.body
         comic_ids = self.match_numbers(body, strict_match)
+        comic_titles = self.match_titles(body)
         responses = []
 
         for comic_id in comic_ids:
@@ -115,9 +118,24 @@ class Bot():
             if comic is None:
                 continue
 
+            self.database.add_id(comment_id, comic["num"])
             response = self.format_response(comic)
             responses.append(response)
+
+        for comic_title in comic_titles:
+            if len(responses) > RESPONSE_COUNT_LIMIT:
+                logger.warning(
+                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                break
+
+            comic = self.get_comic_by_title(comic_title)
+
+            if comic is None:
+                continue
+
             self.database.add_id(comment_id, comic["num"])
+            response = self.format_response(comic)
+            responses.append(response)
 
         if len(responses) > 0:
             response = self.combine_responses(responses)
@@ -250,6 +268,14 @@ class Bot():
         unique_numbers = remove_duplicates(stripped_numbers)
         return unique_numbers
 
+    def match_titles(self, body):
+        """
+        Matches all comic titles that are preceded by an exclamation mark (!) or a number sign (#)
+        """
+        titles = self.match_token("\S+\s", body, True)
+        titles.extend(self.match_token("\S+$", body, True))
+        return titles
+
     def match_latest(self, body, strict_match):
         """
         Matches 'latest' in the body and returns True if it is.
@@ -281,16 +307,17 @@ class Bot():
         Gets the JSON data of the comic with the given number.
         Returns none if there is no comic with the given number.
         """
-        url = f"http://xkcd.com/{number}/info.0.json"
-        response = requests.get(url)
-
         if number == "404":
             logger.info("Got comic with number 404")
             return {"title": "Not Found",
                     "alt": "&nbsp;",
                     "img": "https://www.explainxkcd.com/wiki/images/9/92/not_found.png",
                     "num": 404}
-        elif response.status_code == 404:
+
+        url = f"http://xkcd.com/{number}/info.0.json"
+        response = requests.get(url)
+
+        if response.status_code == 404:
             logger.warning(f"Comic {number} returned a 404 status code")
             return None
         elif response is None:
@@ -300,6 +327,29 @@ class Bot():
             logger.info(f"Got comic with number {number}")
             config = response.json()
             return config
+
+    def get_comic_by_title(self, comic_title):
+        """
+        Returns JSON data of comic with given title.
+
+        If comic doesn't exist, returns None.
+
+        :param comic_title: used to find corresponding comic number in database
+        """
+
+        def format_comic_title(comic_title):
+            """Removes spaces, converts to lower case and returns given comic title."""
+
+            comic_title = comic_title.replace(" ", "")
+            comic_title = comic_title.lower()
+            return comic_title
+
+        comic_title = format_comic_title(comic_title)
+
+        # return requested comic if it exists, otherwise return None
+        comic_num = self.database.get_comic_number(comic_title)
+        if comic_num:
+            return self.get_comic(comic_num)
 
     def get_latest_comic(self):
         """

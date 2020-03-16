@@ -8,6 +8,8 @@ from contextlib import closing
 
 blacklisted_table = "blacklisted"
 statistics_table = "statistics"
+comic_titles_table = "comic_titles"
+
 create_blacklisted_table = f"""
                             CREATE TABLE IF NOT EXISTS {blacklisted_table} (
                                 username VARCHAR (40) NOT NULL PRIMARY KEY
@@ -19,6 +21,12 @@ create_statistics_table = f"""
                                 comment_id VARCHAR (10) NOT NULL,
                                 comic_id   VARCHAR      NOT NULL,
                                 date       DATETIME     DEFAULT (DATETIME('now'))
+                            );
+                            """
+create_comic_titles_table = f"""
+                            CREATE TABLE IF NOT EXISTS {comic_titles_table} (
+                                title       VARCHAR     NOT NULL,
+                                number      INTEGER     NOT NULL
                             );
                             """
 
@@ -38,6 +46,7 @@ class Database():
         if self.connection:
             self.__create_table(create_blacklisted_table)
             self.__create_table(create_statistics_table)
+            self.__create_table(create_comic_titles_table)
 
     def __create_connection(self, database_path):
         """
@@ -125,6 +134,47 @@ class Database():
                 f"Adding comment {comment_id} with comic {comic_id} to database")
             cursor.execute(sql, (comment_id, comic_id))
             self.connection.commit()
+
+    def comic_title_relations_count(self):
+        """Returns the total count of comic titles stored in the database"""
+        sql = f"""
+                SELECT COUNT(*)
+                FROM {comic_titles_table}
+                """
+
+        with closing(self.connection.cursor()) as cursor:
+            logger.info("Returning total count of comic titles stored in the database")
+            cursor.execute(sql)
+            return cursor.fetchone()[0]
+
+    def add_comic_title(self, comic_title, comic_number):
+        """Adds new entry <comic_title> : <comic_number> to the comic titles table."""
+        sql = f"""
+                INSERT INTO {comic_titles_table}
+                    (title, number)
+                VALUES
+                    (?, ?)
+                """
+
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql, (comic_title, comic_number))
+            self.connection.commit()
+
+    def get_comic_number(self, comic_title):
+        """Returns number of comic with given title if it exists, otherwise returns None."""
+        sql = f"""
+                SELECT number
+                FROM {comic_titles_table}
+                WHERE title = ?
+                """
+
+        logger.info(f"Attempting to return number of comic with title: '{comic_title}'")
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql, (comic_title,))
+
+            res = cursor.fetchone()
+            if res is not None:
+                return res[0]
 
     def total_reference_count(self):
         """
