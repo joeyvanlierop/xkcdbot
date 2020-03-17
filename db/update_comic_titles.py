@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests
 import logging
 from time import sleep
@@ -41,9 +43,9 @@ def update():
             continue
         else:
             config = response.json()
-            logger.info(f"Adding new comic {config['safe_title']} : {comic_num} to database")
-            title = format_comic_title(config["safe_title"])
-            database.add_comic_title(title, config["num"])
+            comic_title = format_comic_title(config["safe_title"])
+            logger.info(f"Adding new comic {comic_title} : {comic_num} to database")
+            database.add_comic_title(comic_title, comic_num)
 
 if __name__ == "__main__":
     while True:

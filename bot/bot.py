@@ -278,8 +278,7 @@ class Bot():
         """
         Matches all comic titles that are preceded by an exclamation mark (!) or a number sign (#)
         """
-        titles = self.match_token("\S+\s", body, True)
-        titles.extend(self.match_token("\S+$", body, True))
+        titles = self.match_token("\S+", body, True)
         return titles
 
     def match_latest(self, body, strict_match):
