@@ -17,7 +17,7 @@ class CommentMock:
 
 class TestBot(unittest.TestCase):
     def setUp(self):
-        self.bot = Bot("test_config.json", "test")
+        self.bot = Bot("test_config.json", "test", ":memory:")
 
     def test_get_comic(self):
         self.assertIsNone(self.bot.get_comic(-1))
@@ -73,4 +73,16 @@ class TestBot(unittest.TestCase):
 [Mobile](http://m.xkcd.com/859)  
 [Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
 """
+        # prevents division by zero error when calculating percentage in format_response()
+        self.bot.database.add_id("random_id", 100) # random comment and comic ids
+
         self.assertEqual(self.bot.format_response(self.bot.get_comic(859)), expected)
+
+    def test_match_titles(self):
+        self.assertEqual(self.bot.match_titles("!6 #irony #36blownApart !1000comics"), ["6", "irony", "36blownApart", "1000comics"])
+        self.assertEqual(self.bot.match_titles("#dummy!Title"), ["dummy!Title"])
+
+    def test_get_comic_by_title(self):
+        self.bot.database.add_comic_title("irony", 6)
+        self.assertEqual(self.bot.get_comic_by_title("IrOnY"), {"month": "1", "num": 6, "link": "", "year": "2006", "news": "", "safe_title": "Irony", "transcript": "Narrator: When self-reference, irony, and meta-humor go too far\nNarrator: A CAUTIONARY TALE\nMan 1: This statement wouldn't be funny if not for irony!\nMan 1: ha ha\nMan 2: ha ha, I guess.\nNarrator: 20,000 years later...\n[[desolate badlands landscape with an imposing sun in the sky]]\n{{It's commonly known that too much perspective can be a downer.}}", "alt": "It's commonly known that too much perspective can be a downer.", "img": "https://imgs.xkcd.com/comics/irony_color.jpg", "title": "Irony", "day": "1"})
+        self.assertIsNone(self.bot.get_comic_by_title("dummy"))

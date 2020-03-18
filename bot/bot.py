@@ -126,6 +126,7 @@ class Bot():
             response = self.format_response(comic)
             responses.append(response)
 
+        seen = set()
         for comic_title in comic_titles:
             if len(responses) > RESPONSE_COUNT_LIMIT:
                 logger.warning(
@@ -136,8 +137,10 @@ class Bot():
 
             if comic is None:
                 continue
-            elif str(comic["num"]) in comic_ids:     # check if comic is a duplicate
+            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:     # check if comic is a duplicate
                 continue
+
+            seen.add(str(comic["num"]))
 
             self.database.add_id(comment_id, comic["num"])
             response = self.format_response(comic)
