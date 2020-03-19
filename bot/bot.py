@@ -79,10 +79,10 @@ class Bot():
                 break
 
             # Just a try/except to stop the bot from crashing if one message throws an error
-            # try:
-            callback(item)
-            # except:
-                # logger.error(f"Error while handling message item!")
+            try:
+                callback(item)
+            except:
+                logger.error(f"Error while handling message item!")
             
         time.sleep(sleep_time)
 
