@@ -79,8 +79,8 @@ class Bot():
                 break
             try:
                 callback(item)
-            except:
-                logger.error(f"Error while handling message item!")
+            except Exception as e:
+                logger.error(f"Caught exception '{e}' while handling message item!")
             
         time.sleep(sleep_time)
         
@@ -212,6 +212,10 @@ class Bot():
                                 (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
                                 {}                  # Matches the following token
                                 """.format(token), body)
+            matches.extend(re.findall(r"""(?i)(?x)
+                                (?<= relevant[ ]xkcd:[ ])
+                                {}
+                                """.format(token), body))
         else:
             matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
                                 {}                  # Matches the following token
