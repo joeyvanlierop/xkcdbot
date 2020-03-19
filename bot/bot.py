@@ -63,7 +63,7 @@ class Bot():
                 while True:
                     self.run_stream(inbox_stream, self.handle_inbox)
                     self.run_stream(comment_stream, self.handle_comment)
-            except ServerError as e:
+            except Exception as e:
                 logger.error(e)
                 time.sleep(error_sleep_time)
 
@@ -77,9 +77,6 @@ class Bot():
         for item in stream:
             if item is None:
                 break
-
-
-            # Just a try/except to stop the bot from crashing if one message throws an error
             try:
                 callback(item)
             except:
