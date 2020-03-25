@@ -1,4 +1,5 @@
 import unittest
+import textwrap
 
 from bot.bot import Bot, RESPONSE_CHAR_LIMIT, RESPONSE_COUNT_LIMIT
 
@@ -52,8 +53,7 @@ class TestBot(unittest.TestCase):
         self.assertEqual(comment.save_called, 1, f'Expected 1 save() call, saw {comment.save_called}')
 
     def test_combine_responses_truncates_response(self):
-        # There may be a less fragile way of constructing this test, but this will test the
-        # functionality.
+        # There may be a less fragile way of constructing this test, but this will test the functionality.
         too_many_responses = [f'1' for _ in range(RESPONSE_COUNT_LIMIT + 1)]
         expected_combined_response_length = \
             len('\n'.join(too_many_responses[:RESPONSE_COUNT_LIMIT])) + \
@@ -66,16 +66,13 @@ class TestBot(unittest.TestCase):
         )
 
     def test_urlescape(self):
-        expected = """
-**[859:](http://xkcd.com/859)** (  
-**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
-[Image](https://imgs.xkcd.com/comics/%28.png)  
-[Mobile](http://m.xkcd.com/859)  
-[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
-"""
-        # prevents division by zero error when calculating percentage in format_response()
-        self.bot.database.add_id("random_id", 100) # random comment and comic ids
-
+        expected = textwrap.dedent("""
+        **[859:](http://xkcd.com/859)** (  
+        **Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+        [Image](https://imgs.xkcd.com/comics/%28.png)  
+        [Mobile](http://m.xkcd.com/859)  
+        [Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+        """)
         self.assertEqual(self.bot.format_response(self.bot.get_comic(859)), expected)
 
     def test_match_titles(self):
