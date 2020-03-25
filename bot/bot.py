@@ -358,7 +358,6 @@ class Bot():
         explain = f"http://www.explainxkcd.com/wiki/index.php/{num}"
         comic_count = self.database.comic_id_count(num)
         total_count = self.database.total_reference_count()
-        percentage = comic_count / total_count * 100
         logger.info(f"Formatting response for comic: {num}")
 
         response = textwrap.dedent(f"""  
@@ -369,7 +368,8 @@ class Bot():
         [Explanation]({explain})  
         """)
 
-        if comic_count > 0:
+        if comic_count > 0 and total_count > 0:
+            percentage = comic_count / total_count * 100
             response_statistics = f"\n\tThis comic has been referenced {comic_count} time{'s' if comic_count > 1 else ''}, representing {percentage:.2f}% of all references."
             response += response_statistics
 
