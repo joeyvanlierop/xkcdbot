@@ -83,7 +83,6 @@ class Bot():
                 logger.error(f"Caught exception '{e}' while handling message item!")
             
         time.sleep(sleep_time)
-        
 
     def authenticate(self):
         """Authenticates a reddit user with the credentials from the configuration file."""
@@ -245,7 +244,31 @@ class Bot():
                     seen.add(num)
             return unique_numbers
 
+        def get_range_numbers(body, strict_match):
+            """Matches all comic id ranges and returns a list of all the numbers in those ranges."""
+            ranges = self.match_token(r"\d+\.{3}\d+", body, strict_match)
+
+            ret = []
+            for range_ in ranges:
+                nums = re.findall(r"\d+", range_)
+
+                if nums[0] >= nums[1]:
+                    lo = nums[1]
+                    hi = nums[0]
+                else:
+                    lo = nums[0]
+                    hi = nums[1]
+
+                lo = int(lo)
+                hi = int(hi)
+
+                for i in range(lo, hi+1):
+                    ret.append(str(i))
+            
+            return ret
+
         numbers = self.match_token(r"\d+", body, strict_match)
+        numbers.extend(get_range_numbers(body, strict_match))
         stripped_numbers = strip_leading_zeroes(numbers)
 
         if self.match_latest(body, strict_match):
@@ -339,7 +362,6 @@ class Bot():
         explain = f"http://www.explainxkcd.com/wiki/index.php/{num}"
         comic_count = self.database.comic_id_count(num)
         total_count = self.database.total_reference_count()
-        percentage = comic_count / total_count * 100
         logger.info(f"Formatting response for comic: {num}")
 
         response = textwrap.dedent(f"""  
@@ -350,7 +372,8 @@ class Bot():
         [Explanation]({explain})  
         """)
 
-        if comic_count > 0:
+        if comic_count > 0 and total_count > 0:
+            percentage = comic_count / total_count * 100
             response_statistics = f"\n\tThis comic has been referenced {comic_count} time{'s' if comic_count > 1 else ''}, representing {percentage:.2f}% of all references."
             response += response_statistics
 
