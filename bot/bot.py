@@ -261,7 +261,31 @@ class Bot():
                     seen.add(num)
             return unique_numbers
 
+        def get_range_numbers(body, strict_match):
+            """Matches all comic id ranges and returns a list of all the numbers in those ranges."""
+            ranges = self.match_token(r"\d+\.{3}\d+", body, strict_match)
+
+            ret = []
+            for range_ in ranges:
+                nums = re.findall(r"\d+", range_)
+
+                if nums[0] >= nums[1]:
+                    lo = nums[1]
+                    hi = nums[0]
+                else:
+                    lo = nums[0]
+                    hi = nums[1]
+
+                lo = int(lo)
+                hi = int(hi)
+
+                for i in range(lo, hi+1):
+                    ret.append(str(i))
+            
+            return ret
+
         numbers = self.match_token(r"\d+", body, strict_match)
+        numbers.extend(get_range_numbers(body, strict_match))
         stripped_numbers = strip_leading_zeroes(numbers)
 
         if self.match_latest(body, strict_match):
