@@ -60,8 +60,8 @@ To host your own xkcd bot, follow these simple example steps.
     
 * Create an app [here](https://www.reddit.com/prefs/apps)
    * Create a copy of [config.example.json](xkcdbot/config.example.json) and rename it to config.json
-   * Paste the appropritate credentials into the newly created config.py
-   * Make sure to also add an appropriate user agent in the config.py
+   * Paste the appropritate credentials into the newly created config.json
+   * Make sure to also add an appropriate user agent in the config.json
 * Install the requirements
     
         pip3 install -r requirements.txt
@@ -94,11 +94,11 @@ Please make sure to update tests as appropriate.
     - [x] [!latest](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff98upj/)
     - [x] [Ignore hyperlinks](https://www.reddit.com/r/xkcd/comments/eut0e2/xkcd_2260_reaction_maps/ffrd5jo/)
     - [x] [Literalize certain Markdown reserves characters when they appear as part of a URL](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff6z3yz/)
+    - [x] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
     - [x] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [x] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [ ] Match submissions (currently only matches comments)
     - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
-    - [ ] [Reference comic by title/alias](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff9lxi2/)
     - [ ] [Call bot with "Relevant xkcd: {}"](https://www.reddit.com/r/AskReddit/comments/eunqex/you_are_able_to_choose_1_statistic_to_see_above/fft653g/)
 
 ## License

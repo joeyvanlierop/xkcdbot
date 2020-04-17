@@ -29,3 +29,11 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(self.database.comic_id_count("2"), 2)
         self.assertEqual(self.database.comic_id_count("3"), 4)
         self.assertEqual(self.database.total_reference_count(), 7)
+
+    def test_comic_titles(self):
+        self.assertEqual(self.database.comic_title_relations_count(), 0)
+        self.database.add_comic_title("irony", 6)
+        self.database.add_comic_title("1000comics", 1_000)
+        self.assertEqual(self.database.get_comic_number("irony"), 6)
+        self.assertIsNone(self.database.get_comic_number("idontexist"))
+        self.assertEqual(self.database.comic_title_relations_count(), 2)
