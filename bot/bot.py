@@ -103,15 +103,14 @@ class Bot():
             return
 
         comment_id = comment.id
-        body = comment.body
+        body = comment.body[:5_000]
         comic_ids = self.match_numbers(body, strict_match)
         comic_titles = self.match_titles(body)
         responses = []
 
         for comic_id in comic_ids:
             if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic(comic_id)
@@ -126,8 +125,7 @@ class Bot():
         seen = set()
         for comic_title in comic_titles:
             if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic_by_title(comic_title)
@@ -267,7 +265,7 @@ class Bot():
 
         def get_range_numbers(body, strict_match):
             """Matches all comic id ranges and returns a list of all the numbers in those ranges."""
-            ranges = self.match_token(r"\d+\.{3}\d+", body, strict_match)
+            ranges = self.match_token(r"\d{1,6}\.{3}\d{1,6}", body, strict_match)
 
             ret = []
             for range_ in ranges:
@@ -288,7 +286,7 @@ class Bot():
             
             return ret
 
-        numbers = self.match_token(r"\d+", body, strict_match)
+        numbers = self.match_token(r"\d{1,6}", body, strict_match)
         numbers.extend(get_range_numbers(body, strict_match))
         stripped_numbers = strip_leading_zeroes(numbers)
 
