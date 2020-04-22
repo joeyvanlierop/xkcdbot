@@ -228,9 +228,10 @@ class Bot():
          - If using non-strict matching, all tokens are valid
         """
         if strict_match:
-            matches = re.findall(r"""(?i)(?x)       # Ignore case, comment mode
-                                (?<= ! | \# )       # Must be preceded by an exclamation mark or a pound sign    
-                                {}                  # Matches the following token
+            matches = re.findall(r"""(?i)(?x)        # Ignore case, comment mode
+                                (?:(?<= ^! | ^\#)|   # Must be proceded by start of line and exclamation mark or pound sign
+                                    (?<=\s! | \s\#)) # Or must be preceded by white space and exclamation mark or pound sign
+                                {}                   # Matches the following token
                                 """.format(token), body)
             matches.extend(re.findall(r"""(?i)(?x)
                                 (?<= relevant[ ]xkcd:[ ])
