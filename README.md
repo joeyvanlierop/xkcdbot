@@ -98,8 +98,8 @@ Please make sure to update tests as appropriate.
     - [x] [Backlog/queue script](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff8gjyc/)
     - [x] [Handle range of ids](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7s6zt/)
     - [x] [Call bot with "Relevant xkcd: {}"](https://www.reddit.com/r/AskReddit/comments/eunqex/you_are_able_to_choose_1_statistic_to_see_above/fft653g/)
+    - [x] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
     - [ ] Match submissions (currently only matches comments)
-    - [ ] [Return random comic](https://www.reddit.com/r/xkcd/comments/erydbl/introducing_ubobbytablesbot/ff7wmeh/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
