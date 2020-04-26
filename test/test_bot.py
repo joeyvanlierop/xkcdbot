@@ -38,6 +38,10 @@ class TestBot(unittest.TestCase):
         self.assertEqual(len(self.bot.match_numbers("!random random", True)), 1)
         self.assertEqual(self.bot.match_numbers("!3 relevant xkcd: 6, !relevant xkcd: 5 1", True), ["3", "6", "5"])
         self.assertEqual(self.bot.match_numbers("!9 !23...25 #9...7", True), ["9", "23", "24", "25", "7", "8"])
+        self.assertEqual(self.bot.match_numbers("https://www.google.com/maps/dir/Okay,+Oklahoma,+USA/Whynot,+North+Carolina+27341,+USA/@35.283469,-92.0617932,6z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x87b60bd75e51d2d3:0x120194060a920373!2m2!1d-95.3182985!2d35.8506548!1m5!1m1!1s0x8853609903e1db5b:0x15b011f26e28c49e!2m2!1d-79.7480465!2d35.5402827!3e0", True), [])
+        self.assertEqual(self.bot.match_numbers("number is mid!1string", True), [])
+        self.assertEqual(self.bot.match_numbers("!12 hello https://www.google.com/!1", True), ["12"])
+        self.assertEqual(self.bot.match_numbers("#1mid#6number", True), ["1"])
 
     def test_find_numbers_non_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", False), [])
