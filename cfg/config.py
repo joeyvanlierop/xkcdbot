@@ -7,12 +7,11 @@ logger = logging.getLogger(__name__)
 
 
 class Config():
-    def __init__(self, config_name, config_section):
-        dirname  = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(dirname, config_name)
+    def __init__(self, config_path, config_section):
+        config_path = os.path.abspath(config_path)
 
         with open(config_path, "r") as infile:
-            logger.info(f"Generating config")
+            logger.info(f"Loading config from: {config_path}")
             config = json.load(infile)[config_section] or {}
             self.username = config["username"]
             self.password = config["password"]
@@ -22,4 +21,4 @@ class Config():
             self.subreddits = "+".join(config["subreddits"])
             self.closer = "^" + \
                 " | ".join(config["footers"]).replace(" ", "&nbsp;")
-            logger.info(f"Generated config for user: {self.username}")
+            logger.info(f"Loaded config for user: {self.username}")
