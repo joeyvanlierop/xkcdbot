@@ -2,7 +2,7 @@ name: Build docker container
 
 on:
   push:
-    branches: [master, dockerize]
+    branches: [master]
   pull_request:
     branches: [master]
 
