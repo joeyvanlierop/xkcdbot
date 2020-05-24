@@ -1,0 +1,38 @@
+name: Build docker container
+
+on:
+  push:
+    branches: [master, dockerize]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Publish to Github Packages Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: joeyvanlierop/xkcdbot/xkcdbot
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+          tags: "latest,${{ github.sha }}"
