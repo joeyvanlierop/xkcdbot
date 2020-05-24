@@ -49,7 +49,7 @@ To host your own xkcd bot, follow these simple example steps.
 
 ### Prerequisites
 
-* Python3
+* Python 3.8
 * A Reddit Account
   
 ### Installation
@@ -64,19 +64,19 @@ To host your own xkcd bot, follow these simple example steps.
    * Make sure to also add an appropriate user agent in the config.json
 * Install the requirements
     
-        pip3 install -r requirements.txt
+        pip install -r requirements.txt
 
 ### Running the bot
 
 * From the base directory run:
 
-        python3 -m bot.bot
+        python -m bot.bot
         
 ### Running the tests
 
 * From the base directory run:
 
-        python3 -m unittest discover
+        python -m unittest
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
