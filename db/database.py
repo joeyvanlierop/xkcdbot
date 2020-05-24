@@ -39,8 +39,7 @@ class Database():
         if database_name == ":memory:":
             self.connection = self.__create_connection(":memory:")
         else:
-            dirname = os.path.dirname(os.path.abspath(__file__))
-            database_path = os.path.join(dirname, database_name)
+            database_path = os.path.abspath(database_name)
             self.connection = self.__create_connection(database_path)
 
         if self.connection:
@@ -143,7 +142,8 @@ class Database():
                 """
 
         with closing(self.connection.cursor()) as cursor:
-            logger.info("Returning total count of comic titles stored in the database")
+            logger.info(
+                "Returning total count of comic titles stored in the database")
             cursor.execute(sql)
             return cursor.fetchone()[0]
 
@@ -168,7 +168,8 @@ class Database():
                 WHERE title = ?
                 """
 
-        logger.info(f"Attempting to return number of comic with title: '{comic_title}'")
+        logger.info(
+            f"Attempting to return number of comic with title: '{comic_title}'")
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(sql, (comic_title,))
 

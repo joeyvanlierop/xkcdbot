@@ -12,6 +12,7 @@ General workflow:
 * Reply
 """
 
+import os
 import re
 import time
 import logging
@@ -42,9 +43,18 @@ class Bot():
     :param database_path: Path to the database file within the db folder.
     """
 
-    def __init__(self, config_name="config.json", config_section="default", database_name="database.db"):
-        self.config = Config(config_name, config_section)
-        self.database = Database(database_name)
+    def __init__(self, config_path=None, config_section=None, database_path=None):
+        if not config_path:
+            config_path = os.environ.get("CONFIG_PATH", "cfg/config.json")
+
+        if not config_section:
+            config_section = os.environ.get("CONFIG_SECTION", "default")
+
+        if not database_path:
+            database_path = os.environ.get("DATABASE_PATH", "db/database.db")
+
+        self.config = Config(config_path, config_section)
+        self.database = Database(database_path)
 
     def main(self, error_sleep_time=15):
         """
@@ -80,8 +90,9 @@ class Bot():
             try:
                 callback(item)
             except Exception as e:
-                logger.error(f"Caught exception '{e}' while handling message item!")
-            
+                logger.error(
+                    f"Caught exception '{e}' while handling message item!")
+
         time.sleep(sleep_time)
 
     def authenticate(self):
@@ -134,7 +145,8 @@ class Bot():
 
             if comic is None:
                 continue
-            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:     # check if comic is a duplicate
+            # check if comic is a duplicate
+            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:
                 continue
 
             seen.add(str(comic["num"]))
@@ -286,7 +298,7 @@ class Bot():
 
                 for i in range(lo, hi+1):
                     ret.append(str(i))
-            
+
             return ret
 
         numbers = self.match_token(r"\d+", body, strict_match)
