@@ -68,13 +68,10 @@ class TestBot(unittest.TestCase):
 
     def test_response_size_limited(self):
         comment = CommentMock()
-        too_big_response = ''.join(
-            ['1' for _ in range(RESPONSE_CHAR_LIMIT + 1)])
-        self.bot.reply(comment=comment, response=too_big_response)
-        self.assertEqual(comment.reply_called, 0,
-                         f'Expected no reply() call, saw {comment.reply_called}')
-        self.assertEqual(comment.save_called, 1,
-                         f'Expected 1 save() call, saw {comment.save_called}')
+        too_big_response = ''.join(['1' for _ in range(RESPONSE_CHAR_LIMIT + 1)])
+        self.bot.reply(item=comment, response=too_big_response)
+        self.assertEqual(comment.reply_called, 0, f'Expected no reply() call, saw {comment.reply_called}')
+        self.assertEqual(comment.save_called, 1, f'Expected 1 save() call, saw {comment.save_called}')
 
     def test_combine_responses_truncates_response(self):
         # There may be a less fragile way of constructing this test, but this will test the functionality.

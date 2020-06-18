@@ -8,7 +8,7 @@ from db.database import Database
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-database = Database("database.db")
+database = Database("db/database.db")
 
 def update():
     """Updates database with new comics."""
