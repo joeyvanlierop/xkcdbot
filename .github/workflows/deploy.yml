@@ -1,9 +1,7 @@
-name: Build docker container
+name: Publish docker container
 
 on:
   push:
-    branches: [master]
-  pull_request:
     branches: [master]
 
 jobs:
