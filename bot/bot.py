@@ -212,7 +212,7 @@ class Bot():
         """
         Determines if a submission is valid.
 
-        An valid submission is one that is not:
+        A valid submission is one that is not:
          - A submission posted by a blacklisted user.
          - A submission that is saved.
         """
@@ -236,7 +236,7 @@ class Bot():
         """
         Determines if a comment is valid.
 
-        An valid comment is one that is not:
+        A valid comment is one that is not:
          - A comment posted by this bot.
          - A comment posted by a blacklisted user.
          - A comment that is saved.
@@ -448,7 +448,14 @@ class Bot():
 
     def get_responses_for_comic_ids(self, comic_ids, item_id):
         """
-        DOCSTRING
+        Iterates over a list of comic ids and calls method get_comic for each id.
+        Returns a list with the responses for the given comic ids.
+
+        Positional arguments:
+         - comic_ids: The list of comic ids to return responses for (List[str])
+         - item_id: The id of the comment/submission from which we received the requested comic ids (str)
+
+        Return type: List(dict)
         """
         responses = []
 
@@ -470,7 +477,15 @@ class Bot():
 
     def get_responses_for_comic_titles(self, comic_titles, comic_ids, item_id):
         """
-        DOCSTRING
+        Iterates over a list of comic titles and calls method get_comic_by_title for each title.
+        Returns a list with the responses for the given comic titles.
+
+        Positional arguments:
+         - comic_titles: The list of comic titles to return responses for (List[str])
+         - comic_ids: The list of comic ids we already have responses for. Used for skipping duplicates (List[str])
+         - item_id: The id of the comment/submission from which we received the requested comic ids (str)
+
+        Return type: List(dict)
         """
         responses = []
 
