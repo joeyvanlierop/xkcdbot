@@ -141,3 +141,49 @@ class TestBot(unittest.TestCase):
 
         # test valid
         self.assertTrue(self.bot.valid_submission(sub_3))
+
+    def test_get_responses_for_comic_ids(self):
+        item_id = 352 # arbitrary id
+        comic_327 = """
+**[327:](http://xkcd.com/327)** Exploits of a Mom  
+**Alt-text:** >!Her daughter is named Help I'm trapped in a driver's license factory.!<  
+[Image](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)  
+[Mobile](http://m.xkcd.com/327)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
+\n\tThis comic has been referenced 1 time, representing 100.00% of all references."""
+        comic_859 = """
+**[859:](http://xkcd.com/859)** (  
+**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+[Image](https://imgs.xkcd.com/comics/%28.png)  
+[Mobile](http://m.xkcd.com/859)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+\n\tThis comic has been referenced 1 time, representing 50.00% of all references."""
+
+        expected = [comic_327, comic_859]
+
+        self.assertEqual(self.bot.get_responses_for_comic_ids([327, 859], item_id), expected)
+
+    def test_get_responses_for_comic_titles(self):
+        item_id = 352 # arbitrary id
+        
+        self.bot.database.add_comic_title("exploitsofamom", 327)
+        self.bot.database.add_comic_title("(", 859)
+
+        comic_327 = """
+**[327:](http://xkcd.com/327)** Exploits of a Mom  
+**Alt-text:** >!Her daughter is named Help I'm trapped in a driver's license factory.!<  
+[Image](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)  
+[Mobile](http://m.xkcd.com/327)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
+\n\tThis comic has been referenced 1 time, representing 100.00% of all references."""
+        comic_859 = """
+**[859:](http://xkcd.com/859)** (  
+**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+[Image](https://imgs.xkcd.com/comics/%28.png)  
+[Mobile](http://m.xkcd.com/859)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+\n\tThis comic has been referenced 1 time, representing 50.00% of all references."""
+
+        expected = [comic_327, comic_859]
+
+        self.assertEqual(self.bot.get_responses_for_comic_titles(["eXploIts oF A moM", " (    "], [], item_id), expected)
