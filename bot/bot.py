@@ -66,12 +66,13 @@ class Bot():
         self.authenticate()
         subreddits = self.reddit.subreddit(self.config.subreddits)
         while True:
-            comment_stream = subreddits.stream.comments(
-                pause_after=-1, skip_existing=False)
+            submission_stream = subreddits.stream.submissions(pause_after=-1, skip_existing=False)
+            comment_stream = subreddits.stream.comments(pause_after=-1, skip_existing=False)
             inbox_stream = self.reddit.inbox.stream(pause_after=-1)
             try:
                 while True:
                     self.run_stream(inbox_stream, self.handle_inbox)
+                    self.run_stream(submission_stream, self.handle_submission)
                     self.run_stream(comment_stream, self.handle_comment)
             except Exception as e:
                 logger.error(e)
@@ -90,8 +91,7 @@ class Bot():
             try:
                 callback(item)
             except Exception as e:
-                logger.error(
-                    f"Caught exception '{e}' while handling message item!")
+                logger.error(f"Caught exception '{e}' while handling message item!")
 
         time.sleep(sleep_time)
 
@@ -106,7 +106,7 @@ class Bot():
 
     def handle_comment(self, comment, strict_match=True):
         """
-        Resposible for calling all the functions which analyze and respond to comments in /r/xkcd
+        Resposible for calling all the functions which analyze and respond to comments
 
         :param strict_match: Passed as an argument to the match_numbers method
         """
@@ -115,49 +115,50 @@ class Bot():
 
         comment_id = comment.id
         body = comment.body
+        username = self.config.username.lower()
+        
+        # makes sure strict_match is False when a comment that mentions the bot
+        # is handled through the comment stream instead of the inbox
+        if username in body:
+            strict_match = False
+
         comic_ids = self.match_numbers(body, strict_match)
         comic_titles = self.match_titles(body)
-        responses = []
 
-        for comic_id in comic_ids:
-            if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
-                break
-
-            comic = self.get_comic(comic_id)
-
-            if comic is None:
-                continue
-
-            self.database.add_id(comment_id, comic["num"])
-            response = self.format_response(comic)
-            responses.append(response)
-
-        seen = set()
-        for comic_title in comic_titles:
-            if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
-                break
-
-            comic = self.get_comic_by_title(comic_title)
-
-            if comic is None:
-                continue
-            # check if comic is a duplicate
-            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:
-                continue
-
-            seen.add(str(comic["num"]))
-
-            self.database.add_id(comment_id, comic["num"])
-            response = self.format_response(comic)
-            responses.append(response)
+        responses = self.get_responses_for_comic_ids(comic_ids, comment_id)
+        responses.extend(self.get_responses_for_comic_titles(comic_titles, comic_ids, comment_id))
 
         if len(responses) > 0:
             response = self.combine_responses(responses)
             self.reply(comment, response)
+
+    def handle_submission(self, submission, strict_match=True):
+        """
+        Resposible for calling all the functions which analyze and respond to submissions
+
+        :param strict_match: Passed as an argument to the match_numbers method
+        """
+        if not self.valid_submission(submission):
+            return
+
+        submission_id = submission.id
+        body = submission.selftext
+        username = self.config.username.lower()
+
+        # makes sure strict_match is False when a submission that mentions the bot
+        # is handled through the submission stream instead of the inbox
+        if username in body:
+            strict_match = False
+
+        comic_ids = self.match_numbers(body, strict_match)
+        comic_titles = self.match_titles(body)
+
+        responses = self.get_responses_for_comic_ids(comic_ids, submission_id)
+        responses.extend(self.get_responses_for_comic_titles(comic_titles, comic_ids, submission_id))
+
+        if len(responses) > 0:
+            response = self.combine_responses(responses)
+            self.reply(submission, response)
 
     def handle_inbox(self, item):
         """Resposible for calling all the functions which analyze and respond to inbox messages and username mentions."""
@@ -168,7 +169,7 @@ class Bot():
             self.handle_private_message(item)
 
         # Username Mention
-        if isinstance(item, praw.models.Comment):
+        if isinstance(item, praw.models.Submission) or isinstance(item, praw.models.Comment):
             self.handle_username_mention(item)
 
     def handle_private_message(self, message):
@@ -179,34 +180,63 @@ class Bot():
         subject = message.subject.lower()
         body = message.body.lower()
         username = message.author.name
-        logger.info(
-            f"Received private message\nSubject: {subject}\nBody: {body}")
+        logger.info(f"Received private message\nSubject: {subject}\nBody: {body}")
 
         if subject == "ignore me" or body == "ignore me":
             logger.info(f"{username} has requested to be blacklisted")
             self.database.add_blacklist(username)
             message.mark_read()
 
-    def handle_username_mention(self, message):
+    def handle_username_mention(self, item):
         """
-        Resposible for calling all the functions which analyze and respond to username mentions.
-        Calls handle_comment with the strict matching off.
+        Resposible for calling all the functions which analyze and respond to username mentions in comments and submissions.
+        Calls handle_comment or handle_submission with strict matching off.
         """
-        subject = message.subject.lower()
-        body = message.body.lower()
+        subject = item.subject.lower()
+        body = item.body.lower()
         username = self.config.username.lower()
-        comment = self.reddit.comment(message)
 
         if subject == "username mention" or username in body:
-            logger.info(f"Received username mention\nBody: {body}")
-            self.handle_comment(comment, False)
-            message.mark_read()
+            if isinstance(item, praw.models.Submission):
+                submission = self.reddit.submission(item)
+                logger.info(f"Received username mention for submission\nBody: {body}")
+                self.handle_submission(submission, False)
+            elif isinstance(item, praw.models.Comment):
+                comment = self.reddit.comment(item)
+                logger.info(f"Received username mention for comment\nBody: {body}")
+                self.handle_comment(comment, False)
+
+            item.mark_read()
+
+    def valid_submission(self, submission):
+        """
+        Determines if a submission is valid.
+
+        A valid submission is one that is not:
+         - A submission posted by a blacklisted user.
+         - A submission that is saved.
+        """
+        if submission.author is None:
+            return False
+
+        username = submission.author.name
+        saved = submission.saved
+
+        if saved:
+            logger.info(f"Found previously saved submission: {submission}")
+            return False
+        elif self.database.is_blacklisted(username):
+            logger.info(f"Found submission from blacklisted user: {username}")
+            return False
+        else:
+            logger.info(f"Found valid submission: {submission}")
+            return True
 
     def valid_comment(self, comment):
         """
         Determines if a comment is valid.
 
-        An valid comment is one that is not:
+        A valid comment is one that is not:
          - A comment posted by this bot.
          - A comment posted by a blacklisted user.
          - A comment that is saved.
@@ -346,6 +376,7 @@ class Bot():
         res = []
         for _ in range(len(random)):
             res.append(randrange(1, latest))
+        
         return res
 
     def get_comic(self, number):
@@ -385,7 +416,6 @@ class Bot():
 
         def format_comic_title(comic_title):
             """Removes spaces, converts to lower case and returns given comic title."""
-
             comic_title = comic_title.replace(" ", "")
             comic_title = comic_title.lower()
             return comic_title
@@ -396,6 +426,8 @@ class Bot():
         comic_num = self.database.get_comic_number(comic_title)
         if comic_num:
             return self.get_comic(comic_num)
+        else:
+            logger.info(f"Could not find comic with title '{comic_title}'")
 
     def get_latest_comic(self):
         """
@@ -413,6 +445,71 @@ class Bot():
             logger.info(f"Got latest comic")
             config = response.json()
             return config["num"]
+
+    def get_responses_for_comic_ids(self, comic_ids, item_id):
+        """
+        Iterates over a list of comic ids and calls method get_comic for each id.
+        Returns a list with the responses for the given comic ids.
+
+        Positional arguments:
+         - comic_ids: The list of comic ids to return responses for (List[str])
+         - item_id: The id of the comment/submission from which we received the requested comic ids (str)
+
+        Return type: List(dict)
+        """
+        responses = []
+
+        for comic_id in comic_ids:
+            if len(responses) == RESPONSE_COUNT_LIMIT:
+                logger.warning(f"Reached the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                break
+
+            comic = self.get_comic(comic_id)
+
+            if comic is None:
+                continue
+
+            self.database.add_id(item_id, comic["num"])
+            response = self.format_response(comic)
+            responses.append(response)
+
+        return responses
+
+    def get_responses_for_comic_titles(self, comic_titles, comic_ids, item_id):
+        """
+        Iterates over a list of comic titles and calls method get_comic_by_title for each title.
+        Returns a list with the responses for the given comic titles.
+
+        Positional arguments:
+         - comic_titles: The list of comic titles to return responses for (List[str])
+         - comic_ids: The list of comic ids we already have responses for. Used for skipping duplicates (List[str])
+         - item_id: The id of the comment/submission from which we received the requested comic ids (str)
+
+        Return type: List(dict)
+        """
+        responses = []
+
+        seen = set()
+        for comic_title in comic_titles:
+            if len(responses) == RESPONSE_COUNT_LIMIT:
+                logger.warning(f"Reached the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                break
+
+            comic = self.get_comic_by_title(comic_title)
+
+            if comic is None:
+                continue
+            # check if comic is a duplicate
+            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:
+                continue
+
+            seen.add(str(comic["num"]))
+
+            self.database.add_id(item_id, comic["num"])
+            response = self.format_response(comic)
+            responses.append(response)
+
+        return responses
 
     def format_response(self, data):
         """Formats a comics json data into a detailed response and returns it."""
@@ -465,18 +562,17 @@ class Bot():
         {self.config.closer}
         """)
 
-    def reply(self, comment, response):
-        """Replies to the given comment with the given response."""
+    def reply(self, item, response):
+        """Replies to the given item (submission/comment) with the given response."""
         if len(response) >= RESPONSE_CHAR_LIMIT:
-            logger.warning(f'Comment size {len(response)} exceeded {RESPONSE_CHAR_LIMIT} response char limit, '
+            logger.warning(f'Response size {len(response)} exceeded response char limit {RESPONSE_CHAR_LIMIT}, '
                            f'saving and skipping.')
-            comment.save()
+            item.save()
             return
 
-        logger.info(f"Saving and replying to {comment}")
-        comment.reply(response)
-        comment.save()
-
+        logger.info(f"Saving and replying to {item}")
+        item.reply(response)
+        item.save()
 
 if __name__ == "__main__":
     bot = Bot()

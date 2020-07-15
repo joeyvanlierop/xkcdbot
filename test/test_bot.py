@@ -15,6 +15,16 @@ class CommentMock:
     def save(self):
         self.save_called += 1
 
+class SubmissionMock:
+    def __init__(self, _id=0, author=None, selftext="", saved=0):
+        self.id = _id
+        self.author = author
+        self.selftext = selftext
+        self.saved = saved
+
+class Author:
+    def __init__(self, name):
+        self.name = name
 
 class TestBot(unittest.TestCase):
     def setUp(self):
@@ -50,7 +60,7 @@ class TestBot(unittest.TestCase):
             "!12 hello https://www.google.com/!1", True), ["12"])
         self.assertEqual(self.bot.match_numbers("#1mid#6number", True), ["1"])
 
-    def test_find_numbers_non_strict(self):
+    def test_match_numbers_non_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", False), [])
         self.assertEqual(self.bot.match_numbers("!123.", False), ["123"])
         self.assertEqual(self.bot.match_numbers(
@@ -68,13 +78,10 @@ class TestBot(unittest.TestCase):
 
     def test_response_size_limited(self):
         comment = CommentMock()
-        too_big_response = ''.join(
-            ['1' for _ in range(RESPONSE_CHAR_LIMIT + 1)])
-        self.bot.reply(comment=comment, response=too_big_response)
-        self.assertEqual(comment.reply_called, 0,
-                         f'Expected no reply() call, saw {comment.reply_called}')
-        self.assertEqual(comment.save_called, 1,
-                         f'Expected 1 save() call, saw {comment.save_called}')
+        too_big_response = ''.join(['1' for _ in range(RESPONSE_CHAR_LIMIT + 1)])
+        self.bot.reply(item=comment, response=too_big_response)
+        self.assertEqual(comment.reply_called, 0, f'Expected no reply() call, saw {comment.reply_called}')
+        self.assertEqual(comment.save_called, 1, f'Expected 1 save() call, saw {comment.save_called}')
 
     def test_combine_responses_truncates_response(self):
         # There may be a less fragile way of constructing this test, but this will test the functionality.
@@ -112,3 +119,71 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot.get_comic_by_title("IrOnY"), {"month": "1", "num": 6, "link": "", "year": "2006", "news": "", "safe_title": "Irony",
                                                                 "transcript": "Narrator: When self-reference, irony, and meta-humor go too far\nNarrator: A CAUTIONARY TALE\nMan 1: This statement wouldn't be funny if not for irony!\nMan 1: ha ha\nMan 2: ha ha, I guess.\nNarrator: 20,000 years later...\n[[desolate badlands landscape with an imposing sun in the sky]]\n{{It's commonly known that too much perspective can be a downer.}}", "alt": "It's commonly known that too much perspective can be a downer.", "img": "https://imgs.xkcd.com/comics/irony_color.jpg", "title": "Irony", "day": "1"})
         self.assertIsNone(self.bot.get_comic_by_title("dummy"))
+
+    def test_valid_submission(self):
+        author = Author("MockAuthor")
+        bl_author = Author("BlacklistMe")
+        self.bot.database.add_blacklist("BlacklistMe")
+
+        sub_0 = SubmissionMock()                        # author None
+        sub_1 = SubmissionMock(author=author, saved=1)  # saved
+        sub_2 = SubmissionMock(author=bl_author)        # author blacklisted
+        sub_3 = SubmissionMock(author=author)           # valid
+
+        # test author is None
+        self.assertFalse(self.bot.valid_submission(sub_0))
+
+        # test saved
+        self.assertFalse(self.bot.valid_submission(sub_1))
+
+        # test blacklist
+        self.assertFalse(self.bot.valid_submission(sub_2))
+
+        # test valid
+        self.assertTrue(self.bot.valid_submission(sub_3))
+
+    def test_get_responses_for_comic_ids(self):
+        item_id = 352 # arbitrary id
+        comic_327 = """
+**[327:](http://xkcd.com/327)** Exploits of a Mom  
+**Alt-text:** >!Her daughter is named Help I'm trapped in a driver's license factory.!<  
+[Image](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)  
+[Mobile](http://m.xkcd.com/327)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
+\n\tThis comic has been referenced 1 time, representing 100.00% of all references."""
+        comic_859 = """
+**[859:](http://xkcd.com/859)** (  
+**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+[Image](https://imgs.xkcd.com/comics/%28.png)  
+[Mobile](http://m.xkcd.com/859)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+\n\tThis comic has been referenced 1 time, representing 50.00% of all references."""
+
+        expected = [comic_327, comic_859]
+
+        self.assertEqual(self.bot.get_responses_for_comic_ids([327, 859], item_id), expected)
+
+    def test_get_responses_for_comic_titles(self):
+        item_id = 352 # arbitrary id
+        
+        self.bot.database.add_comic_title("exploitsofamom", 327)
+        self.bot.database.add_comic_title("(", 859)
+
+        comic_327 = """
+**[327:](http://xkcd.com/327)** Exploits of a Mom  
+**Alt-text:** >!Her daughter is named Help I'm trapped in a driver's license factory.!<  
+[Image](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)  
+[Mobile](http://m.xkcd.com/327)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/327)  
+\n\tThis comic has been referenced 1 time, representing 100.00% of all references."""
+        comic_859 = """
+**[859:](http://xkcd.com/859)** (  
+**Alt-text:** >!Brains aside, I wonder how many poorly-written xkcd.com-parsing scripts will break on this title (or ;;"\'\'{<<[\' this mouseover text."!<  
+[Image](https://imgs.xkcd.com/comics/%28.png)  
+[Mobile](http://m.xkcd.com/859)  
+[Explanation](http://www.explainxkcd.com/wiki/index.php/859)  
+\n\tThis comic has been referenced 1 time, representing 50.00% of all references."""
+
+        expected = [comic_327, comic_859]
+
+        self.assertEqual(self.bot.get_responses_for_comic_titles(["eXploIts oF A moM", " (    "], [], item_id), expected)
