@@ -161,7 +161,7 @@ class Database():
             self.connection.commit()
 
     def get_comic_number(self, comic_title):
-        """Returns number of comic with given title if it exists, otherwise returns None."""
+        """Returns number (int) of comic with given title if it exists, otherwise returns None."""
         sql = f"""
                 SELECT number
                 FROM {comic_titles_table}

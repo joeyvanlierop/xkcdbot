@@ -114,15 +114,14 @@ class Bot():
             return
 
         comment_id = comment.id
-        body = comment.body
+        body = comment.body[:10_000]
         comic_ids = self.match_numbers(body, strict_match)
         comic_titles = self.match_titles(body)
         responses = []
 
         for comic_id in comic_ids:
             if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic(comic_id)
@@ -134,11 +133,10 @@ class Bot():
             response = self.format_response(comic)
             responses.append(response)
 
-        seen = set()
+        seen = set(comic_ids)
         for comic_title in comic_titles:
             if len(responses) > RESPONSE_COUNT_LIMIT:
-                logger.warning(
-                    f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
+                logger.warning(f"Exceeded the reponse count limit of {RESPONSE_COUNT_LIMIT} responses")
                 break
 
             comic = self.get_comic_by_title(comic_title)
@@ -146,10 +144,10 @@ class Bot():
             if comic is None:
                 continue
             # check if comic is a duplicate
-            elif str(comic["num"]) in comic_ids or str(comic["num"]) in seen:
+            elif comic["num"] in seen:
                 continue
 
-            seen.add(str(comic["num"]))
+            seen.add(comic["num"])
 
             self.database.add_id(comment_id, comic["num"])
             response = self.format_response(comic)
@@ -307,12 +305,17 @@ class Bot():
 
         if self.match_latest(body, strict_match):
             stripped_numbers.append(self.get_latest_comic())
+
         rand = self.match_random(body, strict_match)
 
         if rand:
             stripped_numbers.extend(rand)
 
         unique_numbers = remove_duplicates(stripped_numbers)
+
+        # convert numbers from strings to integers
+        unique_numbers = list(map(int, unique_numbers))
+
         return unique_numbers
 
     def match_titles(self, body):
@@ -353,7 +356,7 @@ class Bot():
         Gets the JSON data of the comic with the given number.
         Returns none if there is no comic with the given number.
         """
-        if number == "404":
+        if number == 404:
             logger.info("Got comic with number 404")
             return {"title": "Not Found",
                     "alt": "&nbsp;",
@@ -363,12 +366,12 @@ class Bot():
         url = f"http://xkcd.com/{number}/info.0.json"
         response = requests.get(url)
 
-        if response.status_code == 404:
-            logger.warning(f"Comic {number} returned a 404 status code")
-            return None
-        elif response is None:
-            logger.warning(f"Comic {number} returned none")
-            return None
+        if response is None:
+            logger.warning(f"Comic {number} returned None")
+            return
+        elif response.status_code != 200:
+            logger.warning(f"Comic {number} returned a {response.status_code} status code")
+            return
         else:
             logger.info(f"Got comic with number {number}")
             config = response.json()
@@ -392,7 +395,6 @@ class Bot():
 
         comic_title = format_comic_title(comic_title)
 
-        # return requested comic if it exists, otherwise return None
         comic_num = self.database.get_comic_number(comic_title)
         if comic_num:
             return self.get_comic(comic_num)
