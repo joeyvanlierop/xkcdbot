@@ -3,7 +3,6 @@ import textwrap
 
 from bot.bot import Bot, RESPONSE_CHAR_LIMIT, RESPONSE_COUNT_LIMIT
 
-
 class CommentMock:
     def __init__(self):
         self.reply_called = 0
@@ -18,6 +17,7 @@ class CommentMock:
 
 class TestBot(unittest.TestCase):
     def setUp(self):
+        self.maxDiff = None
         self.bot = Bot("./cfg/test_config.json", "test", ":memory:")
 
     def test_get_comic(self):
@@ -31,40 +31,40 @@ class TestBot(unittest.TestCase):
 
     def test_match_numbers_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", True), [])
-        self.assertEqual(self.bot.match_numbers("!123 !123", True), ["123"])
+        self.assertEqual(self.bot.match_numbers("!123 !123", True), [123])
         self.assertEqual(self.bot.match_numbers(
-            "7? !080. !99", True), ["80", "99"])
-        self.assertEqual(self.bot.match_numbers("!900 10000", True), ["900"])
+            "7? !080. !99", True), [80, 99])
+        self.assertEqual(self.bot.match_numbers("!900 10000", True), [900])
         self.assertEqual(self.bot.match_numbers(
-            "!Test !001234 5678 !-1", True), ["1234"])
+            "!Test !001234 5678 !-1", True), [1234])
         self.assertEqual(
             len(self.bot.match_numbers("!random random", True)), 1)
         self.assertEqual(self.bot.match_numbers(
-            "!3 relevant xkcd: 6, !relevant xkcd: 5 1", True), ["3", "6", "5"])
+            "!3 relevant xkcd: 6, !relevant xkcd: 5 1", True), [3, 6, 5])
         self.assertEqual(self.bot.match_numbers("!9 !23...25 #9...7", True), [
-                         "9", "23", "24", "25", "7", "8"])
+                         9, 23, 24, 25, 7, 8])
         self.assertEqual(self.bot.match_numbers("https://www.google.com/maps/dir/Okay,+Oklahoma,+USA/Whynot,+North+Carolina+27341,+USA/@35.283469,-92.0617932,6z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x87b60bd75e51d2d3:0x120194060a920373!2m2!1d-95.3182985!2d35.8506548!1m5!1m1!1s0x8853609903e1db5b:0x15b011f26e28c49e!2m2!1d-79.7480465!2d35.5402827!3e0", True), [])
         self.assertEqual(self.bot.match_numbers(
             "number is mid!1string", True), [])
         self.assertEqual(self.bot.match_numbers(
-            "!12 hello https://www.google.com/!1", True), ["12"])
-        self.assertEqual(self.bot.match_numbers("#1mid#6number", True), ["1"])
+            "!12 hello https://www.google.com/!1", True), [12])
+        self.assertEqual(self.bot.match_numbers("#1mid#6number", True), [1])
 
-    def test_find_numbers_non_strict(self):
+    def test_match_numbers_non_strict(self):
         self.assertEqual(self.bot.match_numbers("Test", False), [])
-        self.assertEqual(self.bot.match_numbers("!123.", False), ["123"])
+        self.assertEqual(self.bot.match_numbers("!123.", False), [123])
         self.assertEqual(self.bot.match_numbers(
-            "07/ !080. !00099 99 0099", False), ["7", "80", "99"])
+            "07/ !080. !00099 99 0099", False), [7, 80, 99])
         self.assertEqual(self.bot.match_numbers(
-            "!900 010000", False), ["900", "10000"])
+            "!900 010000", False), [900, 10000])
         self.assertEqual(self.bot.match_numbers(
-            "!Test !1234 5678 !-1", False), ["1234", "5678", "1"])
+            "!Test !1234 5678 !-1", False), [1234, 5678, 1])
         self.assertEqual(
             len(self.bot.match_numbers("!random random", False)), 2)
         self.assertEqual(self.bot.match_numbers(
-            "!3 relevant xkcd: 6, !relevant xkcd: 5 1", False), ["3", "6", "5", "1"])
+            "!3 relevant xkcd: 6, !relevant xkcd: 5 1", False), [3, 6, 5, 1])
         self.assertEqual(self.bot.match_numbers("9 23...25 9...7", False), [
-                         "9", "23", "25", "7", "24", "8"])
+                         9, 23, 25, 7, 24, 8])
 
     def test_response_size_limited(self):
         comment = CommentMock()
