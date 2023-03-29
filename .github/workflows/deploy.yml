@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Publish to Github Packages Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: joeyvanlierop/xkcdbot/xkcdbot
           registry: docker.pkg.github.com
